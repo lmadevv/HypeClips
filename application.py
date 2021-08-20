@@ -31,7 +31,20 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register():
-    return None
+    users = User.query.all()
+
+    for user in users:
+        if (request.json['username'] == user.username):
+            return {"status": "unsuccessful registration"}, 400
+
+    if (len(request.json['username']) > 20) or (len(request.json['password']) > 40):
+        return {"status": "unsuccessful registration"}, 400
+
+    newUser = User(username=request.json['username'], password=request.json['password'])
+    db.session.add(newUser)
+    db.session.commit()
+
+    return {"status": "successful registration"}, 200
 
 @app.route('/clips')
 def getClips():
