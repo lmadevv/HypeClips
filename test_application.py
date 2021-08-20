@@ -68,3 +68,47 @@ class UserLogin(BaseUserTestCase):
         assert responseOne.json['status'] == "not a valid login"
         assert responseTwo.status_code == 401
         assert responseTwo.json['status'] == "not a valid login"
+
+class UserRegister(BaseUserTestCase):
+    """
+    Tests for the /register endpoint.
+    """
+
+    def testValidRegistration(self):
+        """
+        Tests for a valid registration
+        """
+        # Call the register method
+        response = self.client.post('/register', json=dict(username="bob", password="pass123"))
+
+        # Check if the response is what we wanted
+        assert response.status_code == 200
+        assert response.json['status'] == "successful registration"
+
+        # Get the user from the database
+        user = User.query.get(1)
+
+        # Check if the info is the original info
+        assert user.username == "bob"
+        assert user.password == "pass123"
+
+    def testInvalidRegistration(self):
+        """
+        Tests for invalid registrations
+        """
+        # Set up all the data needed
+        db.session.add(self.createUser())
+        db.session.commit()
+
+        # Call the register methods with 1) same username, 2) too long username, 3) too long password
+        responseOne = self.client.post('/register', json=dict(username="bob", password="123123"))
+        responseTwo = self.client.post('/register', json=dict(username="basdkjfasdjflkjasdflkjaskfdjaslkdfjlskadjflkasjdflkjadflkasjklfsfob", password="123123"))
+        responseThree = self.client.post('/register', json=dict(username="bob", password="123121231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231233"))
+
+        # Check if the response is what we wanted
+        assert responseOne.status_code == 400
+        assert responseOne.json['status'] == "unsuccessful registration"
+        assert responseTwo.status_code == 400
+        assert responseTwo.json['status'] == "unsuccessful registration"
+        assert responseThree.status_code == 400
+        assert responseThree.json['status'] == "unsuccessful registration"
