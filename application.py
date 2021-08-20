@@ -1,4 +1,11 @@
-from flask import Flask
+# How to run the server (testing):
+# export FLASK_APP=application.py
+# export FLASK_ENV=development
+# flask run
+
+# TESTING ACCOUNT DATABASE: USERNAME = bob PASSWORD = pass123
+
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -13,7 +20,14 @@ class User(db.Model):
 
 @app.route('/login', methods=['POST'])
 def login():
-    return None
+    users = User.query.all()
+
+    for user in users:
+        if (request.json['username'] == user.username):
+            if (request.json['password'] == user.password):
+                return {"status": "successful login"}, 200
+
+    return {"status": "not a valid login"}, 401
 
 @app.route('/register', methods=['POST'])
 def register():
