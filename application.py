@@ -18,7 +18,7 @@ def login():
     if user != None and user.password == request.json['password']:
         return ''
     else:
-        return {"status": "not a valid login"}, 401
+        return {"status": "not a valid login"}, 404
 
 @app.route('/register', methods=['POST'])
 def register():
