@@ -13,9 +13,9 @@ class User(db.Model):
 
 @app.route('/login', methods=['POST'])
 def login():
-    user = User.query.filter_by(username=request.json['username']).first()
+    user = User.query.filter_by(username=request.json['username'], password=request.json['password']).first()
 
-    if user != None and user.password == request.json['password']:
+    if user != None:
         return ''
     else:
         return {"status": "not a valid login"}, 404
