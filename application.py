@@ -20,22 +20,19 @@ class User(db.Model):
 
 @app.route('/login', methods=['POST'])
 def login():
-    users = User.query.all()
+    user = User.query.filter_by(username=request.json['username']).first()
 
-    for user in users:
-        if (request.json['username'] == user.username):
-            if (request.json['password'] == user.password):
-                return {"status": "successful login"}, 200
-
-    return {"status": "not a valid login"}, 401
+    if user != None and user.password == request.json['password']:
+        return {"status": "successful login"}, 200
+    else:
+        return {"status": "not a valid login"}, 401
 
 @app.route('/register', methods=['POST'])
 def register():
-    users = User.query.all()
+    user = User.query.filter_by(username=request.json['username']).first()
 
-    for user in users:
-        if (request.json['username'] == user.username):
-            return {"status": "unsuccessful registration"}, 400
+    if (user != None):
+        return {"status": "unsuccessful registration"}, 400
 
     if (len(request.json['username']) > 20) or (len(request.json['password']) > 40):
         return {"status": "unsuccessful registration"}, 400
