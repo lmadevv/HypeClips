@@ -1,10 +1,3 @@
-# How to run the server (testing):
-# export FLASK_APP=application.py
-# export FLASK_ENV=development
-# flask run
-
-# TESTING ACCOUNT DATABASE: USERNAME = bob PASSWORD = pass123
-
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
