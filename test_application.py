@@ -49,7 +49,6 @@ class UserLogin(BaseUserTestCase):
 
         # Check if the response is what we wanted
         assert response.status_code == 200
-        assert response.json['status'] == "successful login"
 
     def testInvalidLogin(self):
         """
@@ -83,7 +82,6 @@ class UserRegister(BaseUserTestCase):
 
         # Check if the response is what we wanted
         assert response.status_code == 200
-        assert response.json['status'] == "successful registration"
 
         # Get the user from the database
         user = User.query.get(1)

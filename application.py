@@ -23,7 +23,7 @@ def login():
     user = User.query.filter_by(username=request.json['username']).first()
 
     if user != None and user.password == request.json['password']:
-        return {"status": "successful login"}, 200
+        return ''
     else:
         return {"status": "not a valid login"}, 401
 
@@ -45,7 +45,7 @@ def register():
     db.session.add(newUser)
     db.session.commit()
 
-    return {"status": "successful registration"}, 200
+    return ''
 
 @app.route('/clips')
 def getClips():
