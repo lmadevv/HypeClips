@@ -32,10 +32,14 @@ def register():
     user = User.query.filter_by(username=request.json['username']).first()
 
     if (user != None):
-        return {"status": "unsuccessful registration"}, 400
+        return {"status": "unsuccessful registration: user with username already exists"}, 400
 
-    if (len(request.json['username']) > 20) or (len(request.json['password']) > 40):
-        return {"status": "unsuccessful registration"}, 400
+    if len(request.json['username']) > 20:
+        return {"status": "unsuccessful registration: username too long"}, 400
+
+    if len(request.json['password']) > 40:
+        return {"status": "unsuccessful registration: password too long"}, 400
+
 
     newUser = User(username=request.json['username'], password=request.json['password'])
     db.session.add(newUser)

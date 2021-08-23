@@ -103,12 +103,12 @@ class UserRegister(BaseUserTestCase):
         # Call the register methods with 1) same username, 2) too long username, 3) too long password
         responseOne = self.client.post('/register', json=dict(username="bob", password="123123"))
         responseTwo = self.client.post('/register', json=dict(username="basdkjfasdjflkjasdflkjaskfdjaslkdfjlskadjflkasjdflkjadflkasjklfsfob", password="123123"))
-        responseThree = self.client.post('/register', json=dict(username="bob", password="123121231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231233"))
+        responseThree = self.client.post('/register', json=dict(username="bob34", password="123121231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231233"))
 
         # Check if the response is what we wanted
         assert responseOne.status_code == 400
-        assert responseOne.json['status'] == "unsuccessful registration"
+        assert responseOne.json['status'] == "unsuccessful registration: user with username already exists"
         assert responseTwo.status_code == 400
-        assert responseTwo.json['status'] == "unsuccessful registration"
+        assert responseTwo.json['status'] == "unsuccessful registration: username too long"
         assert responseThree.status_code == 400
-        assert responseThree.json['status'] == "unsuccessful registration"
+        assert responseThree.json['status'] == "unsuccessful registration: password too long"
