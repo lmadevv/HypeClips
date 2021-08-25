@@ -11,9 +11,9 @@ class BaseUserTestCase(TestCase):
     def create_app(self):
         """Creates the test Flask app and database."""
         test_app = app
-        test_app.config['TESTING'] = True
-        test_app.config['DEBUG'] = False
-        test_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://' # Creates an in-memory database for testing
+        test_app.config["TESTING"] = True
+        test_app.config["DEBUG"] = False
+        test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://" # Creates an in-memory database for testing
         db.init_app(test_app)
         return test_app
 
@@ -45,7 +45,7 @@ class UserLogin(BaseUserTestCase):
         db.session.commit()
 
         # Call the login method
-        response = self.client.post('/login', json=dict(username="bob", password="pass123"))
+        response = self.client.post("/login", json=dict(username="bob", password="pass123"))
 
         # Check if the response is what we wanted
         assert response.status_code == 200
@@ -59,11 +59,11 @@ class UserLogin(BaseUserTestCase):
         db.session.commit()
 
         # Call the login method with invalid username
-        response = self.client.post('/login', json=dict(username="boasdb", password="pass123"))
+        response = self.client.post("/login", json=dict(username="boasdb", password="pass123"))
 
         # Check if the response is what we expected
         assert response.status_code == 404
-        assert response.json['status'] == "not a valid login"
+        assert response.json["status"] == "not a valid login"
 
     def testInvalidLoginWrongPassword(self):
         """
@@ -74,11 +74,11 @@ class UserLogin(BaseUserTestCase):
         db.session.commit()
 
         # Call the login method with invalid password
-        response = self.client.post('/login', json=dict(username="bob", password="pass123asdasd"))
+        response = self.client.post("/login", json=dict(username="bob", password="pass123asdasd"))
 
         # Check if the response is what we wanted
         assert response.status_code == 404
-        assert response.json['status'] == "not a valid login"
+        assert response.json["status"] == "not a valid login"
 
 class UserRegister(BaseUserTestCase):
     """
@@ -90,7 +90,7 @@ class UserRegister(BaseUserTestCase):
         Tests for a valid registration
         """
         # Call the register method
-        response = self.client.post('/register', json=dict(username="bob", password="pass123"))
+        response = self.client.post("/register", json=dict(username="bob", password="pass123"))
 
         # Check if the response is what we wanted
         assert response.status_code == 200
@@ -111,11 +111,11 @@ class UserRegister(BaseUserTestCase):
         db.session.commit()
 
         # Call the register methods with same username
-        response = self.client.post('/register', json=dict(username="bob", password="123123"))
+        response = self.client.post("/register", json=dict(username="bob", password="123123"))
 
         # Check if the response is what we wanted
         assert response.status_code == 400
-        assert response.json['status'] == "unsuccessful registration: user with username already exists"
+        assert response.json["status"] == "unsuccessful registration: user with username already exists"
 
     def testInvalidRegistrationLongUsername(self):
         """
@@ -126,12 +126,12 @@ class UserRegister(BaseUserTestCase):
         db.session.commit()
 
         # Call the register methods with a username that is too long
-        response = self.client.post('/register', json=dict(
+        response = self.client.post("/register", json=dict(
             username="basdkjfasdjflkjasdflkjaskfdjaslkdfjlskadjflkasjdflkjadflkasjklfsfob", password="123123"))
 
         # Check if the response is what we wanted
         assert response.status_code == 400
-        assert response.json['status'] == "unsuccessful registration: username too long"
+        assert response.json["status"] == "unsuccessful registration: username too long"
 
     def testInvalidRegistrationLongPassword(self):
         """
@@ -142,10 +142,10 @@ class UserRegister(BaseUserTestCase):
         db.session.commit()
 
         # Call the register methods with a password that is too long
-        response = self.client.post('/register', json=dict(username="bob34",
+        response = self.client.post("/register", json=dict(username="bob34",
                                                                 password="123121231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231231233"))
 
         # Check if the response is what we wanted
         assert response.status_code == 400
-        assert response.json['status'] == "unsuccessful registration: password too long"
+        assert response.json["status"] == "unsuccessful registration: password too long"
 
