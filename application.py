@@ -33,9 +33,7 @@ def register():
     if len(request.json["password"]) > 40:
         return {"status": "unsuccessful registration: password too long"}, 400
 
-
-    newUser = User(username=request.json["username"], password=request.json["password"])
-    db.session.add(newUser)
+    db.session.add(User(username=request.json["username"], password=request.json["password"]))
     db.session.commit()
 
     return ""
@@ -64,7 +62,7 @@ def getComments():
 def addComment():
     return None
 
-@app.route("user/<userid>")
+@app.route("/user/<userid>")
 def getUser():
     return None
 
