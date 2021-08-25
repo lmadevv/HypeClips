@@ -24,7 +24,7 @@ def login():
 def register():
     user = User.query.filter_by(username=request.json['username']).first()
 
-    if (user != None):
+    if user != None:
         return {"status": "unsuccessful registration: user with username already exists"}, 400
 
     if len(request.json['username']) > 20:
