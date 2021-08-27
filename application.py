@@ -16,7 +16,7 @@ def login():
     user = User.query.filter_by(username=request.json["username"], password=request.json["password"]).first()
 
     if user != None:
-        return ""
+        return {"id": user.id}
     else:
         return {"status": "not a valid login"}, 404
 
