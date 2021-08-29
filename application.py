@@ -36,10 +36,11 @@ def register():
     if len(request.json["password"]) > 40:
         return errorMessageWithCode("unsuccessful registration: password too long", 400)
 
-    db.session.add(User(username=request.json["username"], password=request.json["password"]))
+    newUser = User(username=request.json["username"], password=request.json["password"])
+    db.session.add(newUser)
     db.session.commit()
 
-    return {"id": User.query.filter_by(username=request.json["username"]).first().id}
+    return {"id": newUser.id}
 
 @app.route("/clips")
 def getClips():
