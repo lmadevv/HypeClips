@@ -11,7 +11,7 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(40), nullable=False)
 
-def errorStatusWithCode(status, code):
+def errorMessageWithCode(status, code):
     return {"status": status}, code
 
 @app.route("/login", methods=["POST"])
@@ -21,20 +21,20 @@ def login():
     if user != None:
         return {"id": user.id}
     else:
-        return errorStatusWithCode("not a valid login", 404)
+        return errorMessageWithCode("not a valid login", 404)
 
 @app.route("/register", methods=["POST"])
 def register():
     user = User.query.filter_by(username=request.json["username"]).first()
 
     if user != None:
-        return errorStatusWithCode("unsuccessful registration: user with username already exists", 400)
+        return errorMessageWithCode("unsuccessful registration: user with username already exists", 400)
 
     if len(request.json["username"]) > 20:
-        return errorStatusWithCode("unsuccessful registration: username too long", 400)
+        return errorMessageWithCode("unsuccessful registration: username too long", 400)
 
     if len(request.json["password"]) > 40:
-        return errorStatusWithCode("unsuccessful registration: password too long", 400)
+        return errorMessageWithCode("unsuccessful registration: password too long", 400)
 
     db.session.add(User(username=request.json["username"], password=request.json["password"]))
     db.session.commit()
