@@ -32,9 +32,6 @@ class BaseUserTestCase(TestCase):
         return User(username="bob", password="pass123")
 
 class UserLogin(BaseUserTestCase):
-    """
-    Tests for the /login endpoint.
-    """
 
     def testValidLogin(self):
 
@@ -66,9 +63,6 @@ class UserLogin(BaseUserTestCase):
         assert response.json["status"] == "not a valid login"
 
 class UserRegister(BaseUserTestCase):
-    """
-    Tests for the /register endpoint.
-    """
 
     def testValidRegistration(self):
 
