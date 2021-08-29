@@ -36,7 +36,7 @@ def register():
     db.session.add(User(username=request.json["username"], password=request.json["password"]))
     db.session.commit()
 
-    return ""
+    return {"id": User.query.filter_by(username=request.json["username"]).first().id}
 
 @app.route("/clips")
 def getClips():
