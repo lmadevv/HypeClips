@@ -41,6 +41,7 @@ class UserLogin(BaseUserTestCase):
         response = self.client.post("/login", json=dict(username="bob", password="pass123"))
 
         assert response.status_code == 200
+        assert response.json['id'] == 1
 
     def testInvalidLoginWrongUsername(self):
 
@@ -74,6 +75,7 @@ class UserRegister(BaseUserTestCase):
 
         assert user.username == "bob"
         assert user.password == "pass123"
+        assert response.json['id'] == 1
 
     def testInvalidRegistrationAlreadyRegistered(self):
 
