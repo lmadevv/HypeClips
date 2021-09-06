@@ -1,12 +1,12 @@
 import axios from "axios"
 
 const instance = axios.create({
-  baseURL : "http://localhost:5000/"
+  baseURL: "http://localhost:5000/"
 })
 
 const request = async (method, url, data) => {
   const headers = {
-      authorization: ""
+    authorization: ""
   }
 
   const res = await instance({
@@ -29,7 +29,7 @@ const put = async (url, data = {}) => request("put", url, data)
 
 const patch = async (url, data = {}) => request("patch", url, data)
 
-const Client ={
+const Client = {
   get,
   del,
   post,

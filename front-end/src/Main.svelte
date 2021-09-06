@@ -1,5 +1,5 @@
 <script>
-	import { id } from "./store"
+  import { id } from "./store"
 
   function logout() {
     $id = "undefined"
