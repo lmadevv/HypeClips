@@ -120,6 +120,8 @@ class AddClips(BaseUserTestCase):
         clip = Clip.query.get(1)
         assert response.json["filePath"] == clip.path
 
+        os.remove(clip.path)
+
     def testNoFilePartAdded(self):
 
         response = self.client.put("clips")
