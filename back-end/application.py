@@ -64,7 +64,7 @@ def addClips():
     if file.filename.split(".")[1].lower() != "mp4":
         return errorMessageWithCode("the file had the wrong format", 400)
 
-    clipsPath = os.getcwd() + "/clips"
+    clipsPath = os.getcwd() + "\\clips\\"
     if not os.path.exists(clipsPath):
         os.mkdir(clipsPath)
 
