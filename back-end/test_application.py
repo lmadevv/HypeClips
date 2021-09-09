@@ -1,5 +1,6 @@
 from flask_testing import TestCase
-from application import app, db, User
+from application import app, db, User, Clip
+import os, io
 
 class BaseUserTestCase(TestCase):
     """
@@ -109,3 +110,26 @@ class UserRegister(BaseUserTestCase):
         assert response.status_code == 400
         assert response.json["status"] == "unsuccessful registration: password too long"
 
+class AddClips(BaseUserTestCase):
+
+    def testValidAddedClip(self):
+
+        response = self.client.put("/clips", data={"file": (io.BytesIO(b"this is a test"), "test.mp4")})
+
+        assert response.status_code == 200
+        clip = Clip.query.get(1)
+        assert response.json["filePath"] == clip.path
+
+    def testNoFilePartAdded(self):
+
+        response = self.client.put("clips")
+
+        assert response.status_code == 400
+        assert response.json["status"] == "no file part added to the request"
+
+    def testWrongFileExtensionAdded(self):
+
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf")})
+
+        assert response.status_code == 400
+        assert response.json["status"] == "the file had the wrong format"
