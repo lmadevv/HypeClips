@@ -70,10 +70,11 @@ def addClips():
     fileName = vidUUID + ".mp4"
     request.files["file"].save(os.path.join(clipsPath, fileName))
 
-    db.session.add(Clip(vidUUID=vidUUID))
+    newClip = Clip(vidUUID=vidUUID)
+    db.session.add(newClip)
     db.session.commit()
 
-    return {"vidUUID": vidUUID, "fullVidPath": clipsPath + fileName}
+    return {"id": newClip.id, "vidUUID": vidUUID, "fullVidPath": clipsPath + fileName}
 
 @app.route("/clips/<clipid>")
 def getClip():
