@@ -62,19 +62,20 @@ def addClips():
     if file.filename.split(".")[1].lower() != "mp4":
         return errorMessageWithCode("the file had the wrong format", 400)
 
-    clipsPath = os.getcwd() + "\\clips\\"
+    clipsPath = os.path.join(os.getcwd(), "clips")
     if not os.path.exists(clipsPath):
         os.mkdir(clipsPath)
 
     vidUUID = str(uuid.uuid4())
     fileName = vidUUID + ".mp4"
-    request.files["file"].save(os.path.join(clipsPath, fileName))
+    fullPath = os.path.join(clipsPath, fileName)
+    request.files["file"].save(fullPath)
 
     newClip = Clip(vidUUID=vidUUID)
     db.session.add(newClip)
     db.session.commit()
 
-    return {"id": newClip.id, "vidUUID": vidUUID, "fullVidPath": clipsPath + fileName}
+    return {"id": newClip.id, "vidUUID": vidUUID, "fullVidPath": fullPath}
 
 @app.route("/clips/<clipid>")
 def getClip():
