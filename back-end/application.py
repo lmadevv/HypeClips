@@ -17,7 +17,7 @@ class User(db.Model):
 
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    path = db.Column(db.String(100), nullable=False)
+    vidUUID = db.Column(db.String(100), nullable=False)
 
 def errorMessageWithCode(status, code):
     return {"status": status}, code
@@ -66,14 +66,14 @@ def addClips():
     if not os.path.exists(clipsPath):
         os.mkdir(clipsPath)
 
-    fileName = str(uuid.uuid4()) + ".mp4"
-    fullFilePath = clipsPath + fileName
+    vidUUID = str(uuid.uuid4())
+    fileName = vidUUID + ".mp4"
     request.files["file"].save(os.path.join(clipsPath, fileName))
 
-    db.session.add(Clip(path=fullFilePath))
+    db.session.add(Clip(vidUUID=vidUUID))
     db.session.commit()
 
-    return {"filePath": fullFilePath}
+    return {"vidUUID": vidUUID, "fullVidPath": clipsPath + fileName}
 
 @app.route("/clips/<clipid>")
 def getClip():
