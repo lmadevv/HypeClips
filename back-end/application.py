@@ -3,8 +3,6 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import uuid, os
 
-EMPTY_RESPONSE = ""
-
 app = Flask(__name__)
 # Enable CORS so that front-end requests work when testing locally 
 CORS(app)
