@@ -119,9 +119,9 @@ class AddClips(BaseUserTestCase):
         assert response.status_code == 200
         clip = Clip.query.get(1)
         assert response.json["id"] == 1
-        assert response.json["vidUUID"] == clip.vidUUID
+        assert response.json["clipUUID"] == clip.clipUUID
 
-        os.remove(response.json["fullVidPath"])
+        os.remove(response.json["fullClipPath"])
 
     def testNoFilePartAdded(self):
 
