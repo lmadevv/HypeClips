@@ -72,7 +72,7 @@ def addClips():
     vidUUID = str(uuid.uuid4())
     fileName = vidUUID + ".mp4"
     fullPath = os.path.join(clipsPath, fileName)
-    request.files["file"].save(fullPath)
+    file.save(fullPath)
 
     newClip = Clip(vidUUID=vidUUID)
     db.session.add(newClip)
