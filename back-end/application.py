@@ -78,7 +78,7 @@ def addClips():
     db.session.add(newClip)
     db.session.commit()
 
-    return {"id": newClip.id, "clipUUID": clipUUID, "fullClipPath": fullPath}
+    return {"id": newClip.id}
 
 @app.route("/clips/<clipid>")
 def getClip():
