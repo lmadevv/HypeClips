@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+import uuid, os
 
 app = Flask(__name__)
 # Enable CORS so that front-end requests work when testing locally 
@@ -13,6 +14,10 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(40), nullable=False)
+
+class Clip(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    clipUUID = db.Column(db.String(100), nullable=False)
 
 def errorMessageWithCode(status, code):
     return {"status": status}, code
@@ -51,7 +56,29 @@ def getClips():
 
 @app.route("/clips", methods=["PUT"])
 def addClips():
-    return None
+    if "file" not in request.files:
+        return errorMessageWithCode("no file part added to the request", 400)
+    file = request.files["file"]
+
+    # TODO: Check if the file is in a video format instead of the file extension
+    # This will require us to change the tests if this change does go through
+    if file.filename.split(".")[1].lower() != "mp4":
+        return errorMessageWithCode("the file had the wrong format", 400)
+
+    clipsPath = os.path.join(os.getcwd(), "clips")
+    if not os.path.exists(clipsPath):
+        os.mkdir(clipsPath)
+
+    clipUUID = str(uuid.uuid4())
+    fileName = clipUUID + ".mp4"
+    fullPath = os.path.join(clipsPath, fileName)
+    file.save(fullPath)
+
+    newClip = Clip(clipUUID=clipUUID)
+    db.session.add(newClip)
+    db.session.commit()
+
+    return {"id": newClip.id}
 
 @app.route("/clips/<clipid>")
 def getClip():
