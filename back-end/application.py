@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import uuid, os
@@ -52,7 +52,13 @@ def register():
 
 @app.route("/clips")
 def getClipIDS():
-    return None
+    clips = Clip.query.all()
+
+    output = []
+    for clip in clips:
+        output.append(clip.id)
+
+    return jsonify(output)
 
 @app.route("/clips", methods=["PUT"])
 def addClips():
