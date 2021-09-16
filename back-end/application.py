@@ -51,7 +51,7 @@ def register():
     return {"id": newUser.id}
 
 @app.route("/clips")
-def getClips():
+def getClipIDS():
     return None
 
 @app.route("/clips", methods=["PUT"])
@@ -81,7 +81,7 @@ def addClips():
     return {"id": newClip.id}
 
 @app.route("/clips/<clipid>")
-def getClip():
+def getClipByID():
     return None
 
 @app.route("/clips", methods=["DELETE"])
