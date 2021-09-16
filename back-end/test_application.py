@@ -136,3 +136,26 @@ class AddClips(BaseUserTestCase):
 
         assert response.status_code == 400
         assert response.json["status"] == "the file had the wrong format"
+
+class GetClipIDS(BaseUserTestCase):
+
+    def testGetClipIDS(self):
+
+        db.session.add(Clip(id=5, clipUUID="f7e49c9a-b90b-4d1d-ad3a-309203f0503d"))
+        db.session.add(Clip(id=7, clipUUID="3aacf6bb-1a8d-40f9-ab17-d399a082f633"))
+
+        response = self.client.get('/clips')
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 2
+        assert 5 in response.json
+        assert 7 in response.json
+
+    def testGetClipIDSEmpty(self):
+
+        response = self.client.get('/clips')
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 0
