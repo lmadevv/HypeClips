@@ -17,7 +17,7 @@ class User(db.Model):
 
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    clipUUID = db.Column(db.String(100), nullable=False)
+    clipUuid = db.Column(db.String(100), nullable=False)
 
 def errorMessageWithCode(status, code):
     return {"status": status}, code
@@ -51,7 +51,7 @@ def register():
     return {"id": newUser.id}
 
 @app.route("/clips")
-def getClipIDS():
+def getClipIds():
     clips = Clip.query.all()
 
     output = []
@@ -75,19 +75,19 @@ def addClips():
     if not os.path.exists(clipsPath):
         os.mkdir(clipsPath)
 
-    clipUUID = str(uuid.uuid4())
-    fileName = clipUUID + ".mp4"
+    clipUuid = str(uuid.uuid4())
+    fileName = clipUuid + ".mp4"
     fullPath = os.path.join(clipsPath, fileName)
     file.save(fullPath)
 
-    newClip = Clip(clipUUID=clipUUID)
+    newClip = Clip(clipUuid=clipUuid)
     db.session.add(newClip)
     db.session.commit()
 
     return {"id": newClip.id}
 
 @app.route("/clips/<clipid>")
-def getClipByID():
+def getClipById():
     return None
 
 @app.route("/clips", methods=["DELETE"])
