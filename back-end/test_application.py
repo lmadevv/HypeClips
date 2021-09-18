@@ -120,7 +120,7 @@ class AddClips(BaseUserTestCase):
         clip = Clip.query.get(1)
         assert response.json["id"] == clip.id
 
-        fullClipPath = os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUUID}.mp4")
+        fullClipPath = os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUuid}.mp4")
         os.remove(fullClipPath)
 
     def testNoFilePartAdded(self):
@@ -137,12 +137,12 @@ class AddClips(BaseUserTestCase):
         assert response.status_code == 400
         assert response.json["status"] == "the file had the wrong format"
 
-class GetClipIDS(BaseUserTestCase):
+class GetClipIds(BaseUserTestCase):
 
-    def testGetClipIDS(self):
+    def testGetClipIds(self):
 
-        db.session.add(Clip(id=5, clipUUID="f7e49c9a-b90b-4d1d-ad3a-309203f0503d"))
-        db.session.add(Clip(id=7, clipUUID="3aacf6bb-1a8d-40f9-ab17-d399a082f633"))
+        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d"))
+        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633"))
 
         response = self.client.get('/clips')
 
@@ -152,7 +152,7 @@ class GetClipIDS(BaseUserTestCase):
         assert 5 in response.json
         assert 7 in response.json
 
-    def testGetClipIDSEmpty(self):
+    def testGetClipIdsEmpty(self):
 
         response = self.client.get('/clips')
 
