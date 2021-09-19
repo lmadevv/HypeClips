@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import uuid, os
@@ -87,8 +87,10 @@ def addClips():
     return {"id": newClip.id}
 
 @app.route("/clips/<clipid>")
-def getClipById():
-    return None
+def getClipById(clipid):
+    clip = Clip.query.get_or_404(clipid)
+
+    return send_file(os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUuid}.mp4"), mimetype="application/mp4")
 
 @app.route("/clips", methods=["DELETE"])
 def deleteClip():

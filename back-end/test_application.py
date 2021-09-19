@@ -1,6 +1,6 @@
 from flask_testing import TestCase
 from application import app, db, User, Clip
-import os, io
+import os, io, uuid
 
 class BaseUserTestCase(TestCase):
     """
@@ -159,3 +159,31 @@ class GetClipIds(BaseUserTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 0
+
+class GetClipById(BaseUserTestCase):
+
+    def testGetClipByValidId(self):
+
+        # TODO IM NOT REALLY SURE HOW TO DO THIS TEST ?
+
+        clipUuid = str(uuid.uuid4())
+        db.session.add(Clip(id=5, clipUuid=clipUuid))
+        clipPath = os.path.join(os.path.join(os.getcwd(), "clips"), f"{clipUuid}.mp4")
+
+        testClip = open(clipPath, "w")
+        testClip.write("ASDF")
+        testClip.close()
+
+        response = self.client.get('/clips/5')
+
+        assert response.status_code == 200
+        assert response.data == b"ASDF"
+
+        response.close()
+        os.remove(clipPath)
+
+    def testGetClipByInvalidId(self):
+
+        response = self.client.get('/clips/5')
+
+        assert response.status_code == 404
