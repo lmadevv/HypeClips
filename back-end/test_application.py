@@ -120,8 +120,7 @@ class AddClips(BaseUserTestCase):
         clip = Clip.query.get(1)
         assert response.json["id"] == clip.id
 
-        fullClipPath = os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUuid}.mp4")
-        os.remove(fullClipPath)
+        os.remove(os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUuid}.mp4"))
 
     def testNoFilePartAdded(self):
 
@@ -163,8 +162,6 @@ class GetClipIds(BaseUserTestCase):
 class GetClipById(BaseUserTestCase):
 
     def testGetClipByValidId(self):
-
-        # TODO IM NOT REALLY SURE HOW TO DO THIS TEST ?
 
         clipUuid = str(uuid.uuid4())
         db.session.add(Clip(id=5, clipUuid=clipUuid))
