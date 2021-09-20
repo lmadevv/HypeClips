@@ -18,6 +18,7 @@ class User(db.Model):
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     clipUuid = db.Column(db.String(100), nullable=False)
+    authorId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
 def errorMessageWithCode(status, code):
     return {"status": status}, code
