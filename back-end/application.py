@@ -81,7 +81,7 @@ def addClips():
     fullPath = os.path.join(clipsPath, fileName)
     file.save(fullPath)
 
-    newClip = Clip(clipUuid=clipUuid)
+    newClip = Clip(clipUuid=clipUuid, authorId=int(request.form.get("authorId")))
     db.session.add(newClip)
     db.session.commit()
 
