@@ -19,6 +19,10 @@ class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     clipUuid = db.Column(db.String(100), nullable=False)
 
+    @staticmethod
+    def getClipPath(uuid):
+        return os.path.join(os.path.join(os.getcwd(), "clips"), f"{uuid}.mp4")
+
 def errorMessageWithCode(status, code):
     return {"status": status}, code
 
@@ -76,8 +80,7 @@ def addClips():
         os.mkdir(clipsPath)
 
     clipUuid = str(uuid.uuid4())
-    fileName = clipUuid + ".mp4"
-    fullPath = os.path.join(clipsPath, fileName)
+    fullPath = Clip.getClipPath(clipUuid)
     file.save(fullPath)
 
     newClip = Clip(clipUuid=clipUuid)
@@ -90,7 +93,7 @@ def addClips():
 def getClipById(clipid):
     clip = Clip.query.get_or_404(clipid)
 
-    return send_file(os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUuid}.mp4"), mimetype="application/mp4")
+    return send_file(Clip.getClipPath(clip.clipUuid), mimetype="application/mp4")
 
 @app.route("/clips", methods=["DELETE"])
 def deleteClip():

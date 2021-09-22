@@ -120,7 +120,7 @@ class AddClips(BaseUserTestCase):
         clip = Clip.query.get(1)
         assert response.json["id"] == clip.id
 
-        os.remove(os.path.join(os.path.join(os.getcwd(), "clips"), f"{clip.clipUuid}.mp4"))
+        os.remove(Clip.getClipPath(clip.clipUuid))
 
     def testNoFilePartAdded(self):
 
@@ -165,7 +165,7 @@ class GetClipById(BaseUserTestCase):
 
         clipUuid = str(uuid.uuid4())
         db.session.add(Clip(id=5, clipUuid=clipUuid))
-        clipPath = os.path.join(os.path.join(os.getcwd(), "clips"), f"{clipUuid}.mp4")
+        clipPath = Clip.getClipPath(clipUuid)
 
         testClip = open(clipPath, "w")
         testClip.write("ASDF")
