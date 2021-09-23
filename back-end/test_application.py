@@ -176,6 +176,8 @@ class GetClipById(BaseUserTestCase):
         assert response.status_code == 200
         assert response.data == b"ASDF"
 
+        # Close the response in order to delete the temporary clip created. Without closing it wouldn't delete since
+        # the response keeps the file open. This ensures the file gets closed so we can delete it.
         response.close()
         os.remove(clipPath)
 
