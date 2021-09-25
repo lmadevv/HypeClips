@@ -137,6 +137,13 @@ class AddClips(BaseUserTestCase):
         assert response.status_code == 400
         assert response.json["status"] == "the file had the wrong format"
 
+    def testNoAuthorIdIncluded(self):
+
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf")})
+
+        assert response.status_code == 400
+        assert response.json["status"] == "no author id included"
+
 class GetClipIds(BaseUserTestCase):
 
     def testGetClipIds(self):
