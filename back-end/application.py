@@ -68,6 +68,9 @@ def addClips():
         return errorMessageWithCode("no file part added to the request", 400)
     file = request.files["file"]
 
+    if request.form.get("authorId") is None:
+        return errorMessageWithCode("no author id included", 400)
+
     # TODO: Check if the file is in a video format instead of the file extension
     # This will require us to change the tests if this change does go through
     if file.filename.split(".")[1].lower() != "mp4":
