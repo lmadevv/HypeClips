@@ -14,10 +14,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(40), nullable=False)
+    clips = db.relationship("Clip", backref="user", lazy=True)
 
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     clipUuid = db.Column(db.String(100), nullable=False)
+    authorId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     @staticmethod
     def getClipPath(uuid):
@@ -70,6 +72,9 @@ def addClips():
         return errorMessageWithCode("no file part added to the request", 400)
     file = request.files["file"]
 
+    if request.form.get("authorId") is None:
+        return errorMessageWithCode("no author id included", 400)
+
     # TODO: Check if the file is in a video format instead of the file extension
     # This will require us to change the tests if this change does go through
     if file.filename.split(".")[1].lower() != "mp4":
@@ -83,7 +88,7 @@ def addClips():
     fullPath = Clip.getClipPath(clipUuid)
     file.save(fullPath)
 
-    newClip = Clip(clipUuid=clipUuid)
+    newClip = Clip(clipUuid=clipUuid, authorId=int(request.form.get("authorId")))
     db.session.add(newClip)
     db.session.commit()
 
