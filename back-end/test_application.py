@@ -171,7 +171,7 @@ class GetClipById(BaseUserTestCase):
     def testGetClipByValidId(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid))
+        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
         clipPath = Clip.getClipPath(clipUuid)
 
         testClip = open(clipPath, "w")
