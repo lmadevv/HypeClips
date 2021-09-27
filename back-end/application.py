@@ -100,8 +100,8 @@ def getClipById(clipid):
 
     return send_file(Clip.getClipPath(clip.clipUuid), mimetype="application/mp4")
 
-@app.route("/clips", methods=["DELETE"])
-def deleteClip():
+@app.route("/clips/<clipid>", methods=["DELETE"])
+def deleteClip(clipid):
     return None
 
 @app.route("/comments/<clipid>")
