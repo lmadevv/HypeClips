@@ -193,3 +193,27 @@ class GetClipById(BaseUserTestCase):
         response = self.client.get("/clips/5")
 
         assert response.status_code == 404
+
+class deleteClipById(BaseUserTestCase):
+
+    def testDeleteValidClip(self):
+
+        clipUuid = str(uuid.uuid4())
+        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        clipPath = Clip.getClipPath(clipUuid)
+
+        testClip = open(clipPath, "w")
+        testClip.write("ASDF")
+        testClip.close()
+
+        response = self.client.delete("/clips/5")
+
+        assert response.status_code == 200
+        assert os.path.isfile(Clip.getClipPath(clipUuid)) == False
+        assert self.client.delete("/clips/5").status_code == 404
+
+    def testDeleteInvalidClip(self):
+
+        response = self.client.delete("/clips/5")
+
+        assert response.status_code == 404
