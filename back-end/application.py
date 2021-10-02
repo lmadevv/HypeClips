@@ -106,7 +106,7 @@ def getClipById(clipid):
 def deleteClip(clipid):
     clip = Clip.query.get_or_404(clipid)
 
-    os.remove(clip.getClipPath(clip.clipUuid))
+    os.remove(Clip.getClipPath(clip.clipUuid))
     db.session.delete(clip)
     db.session.commit()
 
