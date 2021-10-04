@@ -149,6 +149,7 @@ class GetClipIds(BaseUserTestCase):
 
         db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2))
         db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5))
+        db.session.commit()
 
         response = self.client.get("/clips")
 
@@ -172,6 +173,7 @@ class GetClipById(BaseUserTestCase):
 
         clipUuid = str(uuid.uuid4())
         db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
         testClip = open(clipPath, "w")
@@ -200,6 +202,7 @@ class DeleteClip(BaseUserTestCase):
 
         clipUuid = str(uuid.uuid4())
         db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
         testClip = open(clipPath, "w")
