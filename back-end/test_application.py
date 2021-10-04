@@ -194,7 +194,7 @@ class GetClipById(BaseUserTestCase):
 
         assert response.status_code == 404
 
-class deleteClipById(BaseUserTestCase):
+class DeleteClip(BaseUserTestCase):
 
     def testDeleteValidClip(self):
 
