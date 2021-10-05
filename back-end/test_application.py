@@ -208,6 +208,7 @@ class DeleteClip(BaseUserTestCase):
         testClip = open(clipPath, "w")
         testClip.write("ASDF")
         testClip.close()
+        assert os.path.isfile(clipPath)
 
         response = self.client.delete("/clips/5")
 
