@@ -3,6 +3,8 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import uuid, os
 
+EMPTY_RESPONSE = ""
+
 app = Flask(__name__)
 # Enable CORS so that front-end requests work when testing locally 
 CORS(app)
@@ -100,9 +102,15 @@ def getClipById(clipid):
 
     return send_file(Clip.getClipPath(clip.clipUuid), mimetype="application/mp4")
 
-@app.route("/clips", methods=["DELETE"])
-def deleteClip():
-    return None
+@app.route("/clips/<clipid>", methods=["DELETE"])
+def deleteClip(clipid):
+    clip = Clip.query.get_or_404(clipid)
+
+    os.remove(Clip.getClipPath(clip.clipUuid))
+    db.session.delete(clip)
+    db.session.commit()
+
+    return EMPTY_RESPONSE
 
 @app.route("/comments/<clipid>")
 def getComments():
