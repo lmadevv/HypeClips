@@ -43,6 +43,7 @@
     class="big-icon"
     src="images/upload.png"
     alt="Upload clip"
+    title="Upload clip"
   />
   <input
     type="file"
@@ -56,6 +57,7 @@
     class="big-icon"
     src="images/logout.png"
     alt="Log out"
+    title="Log out"
   />
 
   {#await getClipIds() then clipIds}
@@ -67,6 +69,7 @@
           class="small-icon"
           src="images/delete.png"
           alt="Delete clip"
+          title="Delete clip"
         />
       </div>
     {/each}
