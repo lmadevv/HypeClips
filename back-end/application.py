@@ -136,12 +136,12 @@ def follow():
 def unfollow():
     return None
 
-@app.route("/clips/<authorid>")
+@app.route("/clipids/<authorid>")
 def getClipIdsForAuthor(authorid):
     clips = Clip.query.filter_by(authorId=authorid).all()
     clipIds = []
 
     for clip in clips:
-        clipIds.append(clip.authorId)
+        clipIds.append(clip.id)
 
     return jsonify(clipIds)
