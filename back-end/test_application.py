@@ -221,3 +221,31 @@ class DeleteClip(BaseUserTestCase):
         response = self.client.delete("/clips/5")
 
         assert response.status_code == 404
+
+class GetClipIdsForAuthor(BaseUserTestCase):
+
+    def testGetPopulatedClipIds(self):
+
+        db.session.add(self.createUser())
+        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1))
+        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1))
+        db.session.commit()
+
+        response = self.client.get("/clipids/1")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 2
+        assert 5 in response.json
+        assert 155 in response.json
+
+    def testGetUnpopulatedClipIds(self):
+
+        db.session.add(self.createUser())
+        db.session.commit()
+
+        response = self.client.get("/clipids/1")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 0
