@@ -233,7 +233,7 @@ class GetClipIdsForAuthor(BaseUserTestCase):
         db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5))
         db.session.commit()
 
-        response = self.client.get("/clipids/1")
+        response = self.client.get("/1/clips")
 
         assert response.status_code == 200
         assert isinstance(response.json, list)
@@ -246,7 +246,7 @@ class GetClipIdsForAuthor(BaseUserTestCase):
         db.session.add(self.createUser())
         db.session.commit()
 
-        response = self.client.get("/clipids/1")
+        response = self.client.get("/1/clips")
 
         assert response.status_code == 200
         assert isinstance(response.json, list)

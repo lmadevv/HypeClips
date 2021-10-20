@@ -136,7 +136,7 @@ def follow():
 def unfollow():
     return None
 
-@app.route("/clipids/<authorid>")
+@app.route("/<authorid>/clips")
 def getClipIdsForAuthor(authorid):
     clips = Clip.query.filter_by(authorId=authorid).all()
     clipIds = []
