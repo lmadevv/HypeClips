@@ -229,6 +229,8 @@ class GetClipIdsForAuthor(BaseUserTestCase):
         db.session.add(self.createUser())
         db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1))
         db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1))
+        # this is just to test that it doesn't return unneccessary clips.
+        db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5))
         db.session.commit()
 
         response = self.client.get("/clipids/1")
