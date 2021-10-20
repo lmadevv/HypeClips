@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 import uuid, os
 
 EMPTY_RESPONSE = ""
@@ -22,6 +23,7 @@ class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     clipUuid = db.Column(db.String(100), nullable=False)
     authorId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    dateOfCreation = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     @staticmethod
     def getClipPath(uuid):
