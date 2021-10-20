@@ -224,7 +224,7 @@ class DeleteClip(BaseUserTestCase):
 
 class GetClipIdsForAuthor(BaseUserTestCase):
 
-    def testGetPopulatedClipIds(self):
+    def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
         db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1))
@@ -241,7 +241,7 @@ class GetClipIdsForAuthor(BaseUserTestCase):
         assert 5 in response.json
         assert 155 in response.json
 
-    def testGetUnpopulatedClipIds(self):
+    def testGetNonexistantClipIds(self):
 
         db.session.add(self.createUser())
         db.session.commit()
