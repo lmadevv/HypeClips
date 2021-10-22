@@ -221,3 +221,33 @@ class DeleteClip(BaseUserTestCase):
         response = self.client.delete("/clips/5")
 
         assert response.status_code == 404
+
+class GetClipIdsForAuthor(BaseUserTestCase):
+
+    def testGetExistingClipIds(self):
+
+        db.session.add(self.createUser())
+        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1))
+        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1))
+        # this is just to test that it doesn't return unneccessary clips.
+        db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5))
+        db.session.commit()
+
+        response = self.client.get("/1/clips")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 2
+        assert 5 in response.json
+        assert 155 in response.json
+
+    def testGetNonexistantClipIds(self):
+
+        db.session.add(self.createUser())
+        db.session.commit()
+
+        response = self.client.get("/1/clips")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 0

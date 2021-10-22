@@ -137,3 +137,13 @@ def follow():
 @app.route("/follow/<follower>/<followee>", methods=["DELETE"])
 def unfollow():
     return None
+
+@app.route("/<authorid>/clips")
+def getClipIdsForAuthor(authorid):
+    clips = Clip.query.filter_by(authorId=authorid).all()
+    clipIds = []
+
+    for clip in clips:
+        clipIds.append(clip.id)
+
+    return jsonify(clipIds)
