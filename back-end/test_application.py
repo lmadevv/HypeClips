@@ -156,8 +156,8 @@ class GetClipIds(BaseUserTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 2
-        assert 5 in response.json
-        assert 7 in response.json
+        assert 5 == response.json[0]
+        assert 7 == response.json[1]
 
     def testGetClipIdsEmpty(self):
 
@@ -238,8 +238,8 @@ class GetClipIdsForAuthor(BaseUserTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 2
-        assert 5 in response.json
-        assert 155 in response.json
+        assert 5 == response.json[0]
+        assert 155 == response.json[1]
 
     def testGetNonexistantClipIds(self):
 
