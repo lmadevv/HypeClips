@@ -114,7 +114,7 @@ class AddClips(BaseUserTestCase):
 
     def testValidAddedClip(self):
 
-        response = self.client.put("/clips", data={"file": (io.BytesIO(b"this is a test"), "test.mp4"), "authorId": 52})
+        response = self.client.put("/clips", data={"file": (io.BytesIO(b"this is a test"), "test.mp4"), "authorId": 52, "title": "Bob sick league clip!"})
 
         assert response.status_code == 200
         clip = Clip.query.get(1)
@@ -131,7 +131,7 @@ class AddClips(BaseUserTestCase):
 
     def testWrongFileExtensionAdded(self):
 
-        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52})
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52, "title": "Bob sick league clip!"})
 
         assert response.status_code == 400
         assert response.json["status"] == "the file had the wrong format"
@@ -147,8 +147,8 @@ class GetClipIds(BaseUserTestCase):
 
     def testGetClipIds(self):
 
-        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2))
-        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5))
+        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2, title="WHAT A FLICK!"))
+        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5, title="DUNK ON NBA"))
         db.session.commit()
 
         response = self.client.get("/clips")
@@ -172,7 +172,7 @@ class GetClipById(BaseUserTestCase):
     def testGetClipByValidId(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7, title="HIKO ARE YOU KIDDING ME"))
         db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
@@ -201,7 +201,7 @@ class DeleteClip(BaseUserTestCase):
     def testDeleteValidClip(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7, title="HIKO ARE YOU KIDDING ME"))
         db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
@@ -227,10 +227,10 @@ class GetClipIdsForAuthor(BaseUserTestCase):
     def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
-        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1))
-        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1))
+        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1, title="CSGO ACE"))
+        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1, title="VALORANT NINJA DEFUSE"))
         # this is just to test that it doesn't return unneccessary clips.
-        db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5))
+        db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
         db.session.commit()
 
         response = self.client.get("/1/clips")
