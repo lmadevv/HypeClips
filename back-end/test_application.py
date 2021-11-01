@@ -3,7 +3,7 @@ from application import app, db, User, Clip
 from datetime import datetime
 import os, io, uuid
 
-class BaseUserTestCase(TestCase):
+class BaseTestCase(TestCase):
     """
     Test case class that all test cases should extend.
     This class handles setting up the test Flask app and test database.
@@ -33,7 +33,10 @@ class BaseUserTestCase(TestCase):
     def createUser(self):
         return User(username="bob", password="pass123")
 
-class UserLogin(BaseUserTestCase):
+    def createClip(self, id, authorId, clipUuid=str(uuid.uuid4()), title="Default clip title", description="", dateOfCreation=datetime.utcnow()):
+        return Clip(id=id, authorId=authorId, clipUuid=clipUuid, title=title, description=description, dateOfCreation=dateOfCreation)
+
+class UserLogin(BaseTestCase):
 
     def testValidLogin(self):
 
@@ -65,7 +68,7 @@ class UserLogin(BaseUserTestCase):
         assert response.status_code == 404
         assert response.json["status"] == "not a valid login"
 
-class UserRegister(BaseUserTestCase):
+class UserRegister(BaseTestCase):
 
     def testValidRegistration(self):
 
@@ -111,15 +114,22 @@ class UserRegister(BaseUserTestCase):
         assert response.status_code == 400
         assert response.json["status"] == "unsuccessful registration: password too long"
 
-class AddClips(BaseUserTestCase):
+class AddClips(BaseTestCase):
 
     def testValidAddedClip(self):
 
-        response = self.client.put("/clips", data={"file": (io.BytesIO(b"this is a test"), "test.mp4"), "authorId": 52})
+        response = self.client.put("/clips", data={"file": (io.BytesIO(b"this is a test"), "test.mp4"), "authorId": 52, "title": "Bob sick league clip!"})
 
         assert response.status_code == 200
         clip = Clip.query.get(1)
         assert response.json["id"] == clip.id
+        assert clip.authorId == 52
+        assert clip.title == "Bob sick league clip!"
+        assert clip.description == ""
+        try:
+            uuid.UUID(clip.clipUuid, version=4)
+        except ValueError:
+            assert False
 
         os.remove(Clip.getClipPath(clip.clipUuid))
 
@@ -132,24 +142,31 @@ class AddClips(BaseUserTestCase):
 
     def testWrongFileExtensionAdded(self):
 
-        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52})
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52, "title": "Bob sick league clip!"})
 
         assert response.status_code == 400
         assert response.json["status"] == "the file had the wrong format"
 
     def testNoAuthorIdIncluded(self):
 
-        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf")})
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "title": "Bob sick league clip!"})
 
         assert response.status_code == 400
         assert response.json["status"] == "no author id included"
 
-class GetClipIds(BaseUserTestCase):
+    def testNoTitleIncluded(self):
+
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52})
+
+        assert response.status_code == 400
+        assert response.json["status"] == "no title included"
+
+class GetClipIds(BaseTestCase):
 
     def testGetClipIds(self):
 
-        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2, dateOfCreation=datetime.min))
-        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5, dateOfCreation=datetime.max))
+        db.session.add(self.createClip(id=5, authorId=2, title="WHAT A FLICK!", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=7, authorId=5, title="DUNK ON NBA", dateOfCreation=datetime.max))
         db.session.commit()
 
         response = self.client.get("/clips")
@@ -169,12 +186,12 @@ class GetClipIds(BaseUserTestCase):
         assert isinstance(response.json, list)
         assert len(response.json) == 0
 
-class GetClipById(BaseUserTestCase):
+class GetClipById(BaseTestCase):
 
     def testGetClipByValidId(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
         db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
@@ -198,12 +215,12 @@ class GetClipById(BaseUserTestCase):
 
         assert response.status_code == 404
 
-class DeleteClip(BaseUserTestCase):
+class DeleteClip(BaseTestCase):
 
     def testDeleteValidClip(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7))
+        db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
         db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
@@ -224,15 +241,16 @@ class DeleteClip(BaseUserTestCase):
 
         assert response.status_code == 404
 
-class GetClipIdsForAuthor(BaseUserTestCase):
+class GetClipIdsForAuthor(BaseTestCase):
 
     def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
-        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1, dateOfCreation=datetime.min))
-        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1, dateOfCreation=datetime.max))
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
+
         # this is just to test that it doesn't return unneccessary clips.
-        db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5))
+        db.session.add(self.createClip(id=15515, authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
         db.session.commit()
 
         response = self.client.get("/1/clips")
