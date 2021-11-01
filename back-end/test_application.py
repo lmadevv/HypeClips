@@ -165,8 +165,8 @@ class GetClipIds(BaseTestCase):
 
     def testGetClipIds(self):
 
-        db.session.add(self.createClip(id=5, authorId=2, title="WHAT A FLICK!"))
-        db.session.add(self.createClip(id=7, authorId=5, title="DUNK ON NBA"))
+        db.session.add(self.createClip(id=5, authorId=2, title="WHAT A FLICK!", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=7, authorId=5, title="DUNK ON NBA", dateOfCreation=datetime.max))
         db.session.commit()
 
         response = self.client.get("/clips")
@@ -174,8 +174,9 @@ class GetClipIds(BaseTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 2
-        assert 5 in response.json
-        assert 7 in response.json
+        assert 7 == response.json[0]
+        assert 5 == response.json[1]
+
 
     def testGetClipIdsEmpty(self):
 
@@ -245,8 +246,9 @@ class GetClipIdsForAuthor(BaseTestCase):
     def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
-        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE"))
-        db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE"))
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
+
         # this is just to test that it doesn't return unneccessary clips.
         db.session.add(self.createClip(id=15515, authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
         db.session.commit()
@@ -256,8 +258,8 @@ class GetClipIdsForAuthor(BaseTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 2
-        assert 5 in response.json
-        assert 155 in response.json
+        assert 155 == response.json[0]
+        assert 5 == response.json[1]
 
     def testGetNonexistantClipIds(self):
 
