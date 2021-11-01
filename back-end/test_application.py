@@ -126,6 +126,10 @@ class AddClips(BaseTestCase):
         assert clip.authorId == 52
         assert clip.title == "Bob sick league clip!"
         assert clip.description == ""
+        try:
+            uuid.UUID(clip.clipUuid, version=4)
+        except ValueError:
+            assert False
 
         os.remove(Clip.getClipPath(clip.clipUuid))
 
