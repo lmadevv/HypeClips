@@ -145,10 +145,17 @@ class AddClips(BaseTestCase):
 
     def testNoAuthorIdIncluded(self):
 
-        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf")})
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "title": "Bob sick league clip!"})
 
         assert response.status_code == 400
         assert response.json["status"] == "no author id included"
+
+    def testNoTitleIncluded(self):
+
+        response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52})
+
+        assert response.status_code == 400
+        assert response.json["status"] == "no title included"
 
 class GetClipIds(BaseTestCase):
 
