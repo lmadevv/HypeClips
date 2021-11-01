@@ -1,5 +1,6 @@
 from flask_testing import TestCase
 from application import app, db, User, Clip
+from datetime import datetime
 import os, io, uuid
 
 class BaseTestCase(TestCase):
@@ -31,6 +32,9 @@ class BaseTestCase(TestCase):
 
     def createUser(self):
         return User(username="bob", password="pass123")
+
+    def createClip(self, id, authorId, clipUuid=str(uuid.uuid4()), title="Default clip title", description="", dateOfCreation=datetime.utcnow()):
+        return Clip(id=id, authorId=authorId, clipUuid=clipUuid, title=title, description=description, dateOfCreation=dateOfCreation)
 
 class UserLogin(BaseTestCase):
 
@@ -150,8 +154,8 @@ class GetClipIds(BaseTestCase):
 
     def testGetClipIds(self):
 
-        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2, title="WHAT A FLICK!"))
-        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5, title="DUNK ON NBA"))
+        db.session.add(self.createClip(id=5, authorId=2, title="WHAT A FLICK!"))
+        db.session.add(self.createClip(id=7, authorId=5, title="DUNK ON NBA"))
         db.session.commit()
 
         response = self.client.get("/clips")
@@ -175,7 +179,7 @@ class GetClipById(BaseTestCase):
     def testGetClipByValidId(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7, title="HIKO ARE YOU KIDDING ME"))
+        db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
         db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
@@ -204,7 +208,7 @@ class DeleteClip(BaseTestCase):
     def testDeleteValidClip(self):
 
         clipUuid = str(uuid.uuid4())
-        db.session.add(Clip(id=5, clipUuid=clipUuid, authorId=7, title="HIKO ARE YOU KIDDING ME"))
+        db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
         db.session.commit()
         clipPath = Clip.getClipPath(clipUuid)
 
@@ -230,10 +234,10 @@ class GetClipIdsForAuthor(BaseTestCase):
     def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
-        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1, title="CSGO ACE"))
-        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1, title="VALORANT NINJA DEFUSE"))
+        db.session.add(self.createClip(id=5, clipUuid=str(uuid.uuid4()), authorId=1, title="CSGO ACE"))
+        db.session.add(self.createClip(id=155, clipUuid=str(uuid.uuid4()), authorId=1, title="VALORANT NINJA DEFUSE"))
         # this is just to test that it doesn't return unneccessary clips.
-        db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
+        db.session.add(self.createClip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
         db.session.commit()
 
         response = self.client.get("/1/clips")
