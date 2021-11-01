@@ -2,7 +2,7 @@ from flask_testing import TestCase
 from application import app, db, User, Clip
 import os, io, uuid
 
-class BaseUserTestCase(TestCase):
+class BaseTestCase(TestCase):
     """
     Test case class that all test cases should extend.
     This class handles setting up the test Flask app and test database.
@@ -32,7 +32,7 @@ class BaseUserTestCase(TestCase):
     def createUser(self):
         return User(username="bob", password="pass123")
 
-class UserLogin(BaseUserTestCase):
+class UserLogin(BaseTestCase):
 
     def testValidLogin(self):
 
@@ -64,7 +64,7 @@ class UserLogin(BaseUserTestCase):
         assert response.status_code == 404
         assert response.json["status"] == "not a valid login"
 
-class UserRegister(BaseUserTestCase):
+class UserRegister(BaseTestCase):
 
     def testValidRegistration(self):
 
@@ -110,7 +110,7 @@ class UserRegister(BaseUserTestCase):
         assert response.status_code == 400
         assert response.json["status"] == "unsuccessful registration: password too long"
 
-class AddClips(BaseUserTestCase):
+class AddClips(BaseTestCase):
 
     def testValidAddedClip(self):
 
@@ -119,6 +119,9 @@ class AddClips(BaseUserTestCase):
         assert response.status_code == 200
         clip = Clip.query.get(1)
         assert response.json["id"] == clip.id
+        assert clip.authorId == 52
+        assert clip.title == "Bob sick league clip!"
+        assert clip.description == ""
 
         os.remove(Clip.getClipPath(clip.clipUuid))
 
@@ -143,7 +146,7 @@ class AddClips(BaseUserTestCase):
         assert response.status_code == 400
         assert response.json["status"] == "no author id included"
 
-class GetClipIds(BaseUserTestCase):
+class GetClipIds(BaseTestCase):
 
     def testGetClipIds(self):
 
@@ -167,7 +170,7 @@ class GetClipIds(BaseUserTestCase):
         assert isinstance(response.json, list)
         assert len(response.json) == 0
 
-class GetClipById(BaseUserTestCase):
+class GetClipById(BaseTestCase):
 
     def testGetClipByValidId(self):
 
@@ -196,7 +199,7 @@ class GetClipById(BaseUserTestCase):
 
         assert response.status_code == 404
 
-class DeleteClip(BaseUserTestCase):
+class DeleteClip(BaseTestCase):
 
     def testDeleteValidClip(self):
 
@@ -222,7 +225,7 @@ class DeleteClip(BaseUserTestCase):
 
         assert response.status_code == 404
 
-class GetClipIdsForAuthor(BaseUserTestCase):
+class GetClipIdsForAuthor(BaseTestCase):
 
     def testGetExistingClipIds(self):
 
