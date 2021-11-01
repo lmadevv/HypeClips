@@ -1,5 +1,6 @@
 from flask_testing import TestCase
 from application import app, db, User, Clip
+from datetime import datetime
 import os, io, uuid
 
 class BaseUserTestCase(TestCase):
@@ -147,8 +148,8 @@ class GetClipIds(BaseUserTestCase):
 
     def testGetClipIds(self):
 
-        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2))
-        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5))
+        db.session.add(Clip(id=5, clipUuid="f7e49c9a-b90b-4d1d-ad3a-309203f0503d", authorId=2, dateOfCreation=datetime.min))
+        db.session.add(Clip(id=7, clipUuid="3aacf6bb-1a8d-40f9-ab17-d399a082f633", authorId=5, dateOfCreation=datetime.max))
         db.session.commit()
 
         response = self.client.get("/clips")
@@ -156,8 +157,9 @@ class GetClipIds(BaseUserTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 2
-        assert 5 in response.json
-        assert 7 in response.json
+        assert 7 == response.json[0]
+        assert 5 == response.json[1]
+
 
     def testGetClipIdsEmpty(self):
 
@@ -227,8 +229,8 @@ class GetClipIdsForAuthor(BaseUserTestCase):
     def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
-        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1))
-        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1))
+        db.session.add(Clip(id=5, clipUuid=str(uuid.uuid4()), authorId=1, dateOfCreation=datetime.min))
+        db.session.add(Clip(id=155, clipUuid=str(uuid.uuid4()), authorId=1, dateOfCreation=datetime.max))
         # this is just to test that it doesn't return unneccessary clips.
         db.session.add(Clip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5))
         db.session.commit()
@@ -238,8 +240,8 @@ class GetClipIdsForAuthor(BaseUserTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 2
-        assert 5 in response.json
-        assert 155 in response.json
+        assert 155 == response.json[0]
+        assert 5 == response.json[1]
 
     def testGetNonexistantClipIds(self):
 

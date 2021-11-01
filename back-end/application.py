@@ -62,7 +62,7 @@ def register():
 
 @app.route("/clips")
 def getClipIds():
-    clips = Clip.query.all()
+    clips = Clip.query.order_by(Clip.dateOfCreation.desc()).all()
 
     output = []
     for clip in clips:
@@ -140,7 +140,7 @@ def unfollow():
 
 @app.route("/<authorid>/clips")
 def getClipIdsForAuthor(authorid):
-    clips = Clip.query.filter_by(authorId=authorid).all()
+    clips = Clip.query.order_by(Clip.dateOfCreation.desc()).filter_by(authorId=authorid).all()
     clipIds = []
 
     for clip in clips:
