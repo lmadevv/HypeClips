@@ -245,10 +245,10 @@ class GetClipIdsForAuthor(BaseTestCase):
     def testGetExistingClipIds(self):
 
         db.session.add(self.createUser())
-        db.session.add(self.createClip(id=5, clipUuid=str(uuid.uuid4()), authorId=1, title="CSGO ACE"))
-        db.session.add(self.createClip(id=155, clipUuid=str(uuid.uuid4()), authorId=1, title="VALORANT NINJA DEFUSE"))
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE"))
+        db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE"))
         # this is just to test that it doesn't return unneccessary clips.
-        db.session.add(self.createClip(id=15515, clipUuid=str(uuid.uuid4()), authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
+        db.session.add(self.createClip(id=15515, authorId=5, title="ROBLOX HIGHLIGHTS WOW"))
         db.session.commit()
 
         response = self.client.get("/1/clips")
