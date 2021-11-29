@@ -271,3 +271,25 @@ class GetClipIdsForAuthor(BaseTestCase):
         assert response.status_code == 200
         assert isinstance(response.json, list)
         assert len(response.json) == 0
+
+class GetClipInformation(BaseTestCase):
+
+    def testGetExistingClipInformation(self):
+
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
+
+        response = self.client.get("/clips/info/5")
+
+        assert response.status_code == 200
+        assert len(response.json) == 4
+        assert response.json["title"] == "CSGO ACE"
+        assert response.json["description"] == ""
+        assert response.json["date"] == str(datetime.min)
+        assert response.json["author"] == "bob"
+
+    def testGetNonexistantClipInformation(self):
+
+        response = self.client.get("/clips/info/5")
+
+        assert response.status_code == 404
