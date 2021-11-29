@@ -18,6 +18,7 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(40), nullable=False)
     clips = db.relationship("Clip", backref="user", lazy=True)
+    comments = db.relationship("Comment", backref="author", lazy=True)
 
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,10 +27,17 @@ class Clip(db.Model):
     dateOfCreation = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     title = db.Column(db.String(20), nullable=False)
     description = db.Column(db.String(200))
+    comments = db.relationship("Comment", backref="clip", lazy=True)
 
     @staticmethod
     def getClipPath(uuid):
         return os.path.join(os.path.join(os.getcwd(), "clips"), f"{uuid}.mp4")
+
+class Comment(db.Model):
+    comment = db.Column(db.String(200), nullable=False)
+    dateOfComment = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    authorId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    clipId = db.Column(db.Integer, db.ForeignKey("clip.id"), nullable=False)
 
 def errorMessageWithCode(status, code):
     return {"status": status}, code
