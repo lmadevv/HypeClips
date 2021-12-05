@@ -35,7 +35,7 @@ class Clip(db.Model):
 
 class Comment(db.Model):
     comment = db.Column(db.String(200), nullable=False)
-    dateOfComment = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    dateOfCreation = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     authorId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     clipId = db.Column(db.Integer, db.ForeignKey("clip.id"), nullable=False)
 
