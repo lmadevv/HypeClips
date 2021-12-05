@@ -277,14 +277,14 @@ class GetClipInformation(BaseTestCase):
     def testGetExistingClipInformation(self):
 
         db.session.add(self.createUser())
-        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
 
         response = self.client.get("/clips/info/5")
 
         assert response.status_code == 200
         assert len(response.json) == 4
         assert response.json["title"] == "CSGO ACE"
-        assert response.json["description"] == ""
+        assert response.json["description"] == "asdfgg"
         assert response.json["date"] == str(datetime.min)
         assert response.json["author"] == "bob"
 
