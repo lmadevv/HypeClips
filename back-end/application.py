@@ -17,7 +17,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(40), nullable=False)
-    clips = db.relationship("Clip", backref="user", lazy=True)
+    clips = db.relationship("Clip", backref="author", lazy=True)
     comments = db.relationship("Comment", backref="author", lazy=True)
 
 class Clip(db.Model):
