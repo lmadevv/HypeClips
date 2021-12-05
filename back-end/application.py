@@ -34,6 +34,7 @@ class Clip(db.Model):
         return os.path.join(os.path.join(os.getcwd(), "clips"), f"{uuid}.mp4")
 
 class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.String(200), nullable=False)
     dateOfCreation = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     authorId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
