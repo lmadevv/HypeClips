@@ -157,3 +157,10 @@ def getClipIdsForAuthor(authorid):
         clipIds.append(clip.id)
 
     return jsonify(clipIds)
+
+@app.route("/clips/info/<clipid>")
+def getClipInformation(clipid):
+    clip = Clip.query.get_or_404(clipid)
+
+    return {"title": clip.title, "description": clip.description, "author": clip.author.username, "date": str(clip.dateOfCreation)}
+
