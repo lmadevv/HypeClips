@@ -301,11 +301,11 @@ class GetComments(BaseTestCase):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
         db.session.add(User(username="tempuser", password="asdf"))
-        db.session.add(Comment(comment="Nice", authorId=2, clipId=1, dateOfCreation=datetime.max))
-        db.session.add(Comment(comment="thanks", authorId=1, clipId=1, dateOfCreation=datetime.min))
+        db.session.add(Comment(comment="Nice", authorId=2, clipId=5, dateOfCreation=datetime.max))
+        db.session.add(Comment(comment="thanks", authorId=1, clipId=5, dateOfCreation=datetime.min))
         db.session.commit()
 
-        response = self.client.get("/comments/1")
+        response = self.client.get("/comments/5")
 
         assert response.status_code == 200
         assert len(response.json) == 2
@@ -317,3 +317,14 @@ class GetComments(BaseTestCase):
         assert response.json[1]["comment"] == "thanks"
         assert response.json[1]["author"] == "bob"
         assert response.json[1]["date"] == str(datetime.min)
+
+    def testGetValidClipWithNoComments(self):
+
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+
+        response = self.client.get("/comments/5")
+
+        assert response.status_code == 200
+        assert len(response.json) == 0
+
