@@ -1,5 +1,5 @@
 from flask_testing import TestCase
-from application import app, db, User, Clip
+from application import app, db, User, Clip, Comment
 from datetime import datetime
 import os, io, uuid
 
@@ -293,3 +293,27 @@ class GetClipInformation(BaseTestCase):
         response = self.client.get("/clips/info/5")
 
         assert response.status_code == 404
+
+class GetComments(BaseTestCase):
+
+    def testGetValidClipWithComments(self):
+
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+        db.session.add(User(username="tempuser", password="asdf"))
+        db.session.add(Comment(comment="Nice", authorId=2, clipId=1, dateOfCreation=datetime.max))
+        db.session.add(Comment(comment="thanks", authorId=1, clipId=1, dateOfCreation=datetime.min))
+        db.session.commit()
+
+        response = self.client.get("/comments/1")
+
+        assert response.status_code == 200
+        assert len(response.json) == 2
+
+        assert response.json[0]["comment"] == "Nice"
+        assert response.json[0]["author"] == "tempuser"
+        assert response.json[0]["date"] == str(datetime.max)
+
+        assert response.json[1]["comment"] == "thanks"
+        assert response.json[1]["author"] == "bob"
+        assert response.json[1]["date"] == str(datetime.min)
