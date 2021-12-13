@@ -147,6 +147,8 @@ def addComment(clipid):
         return errorMessageWithCode("Author doesn't exist", 404)
     if "comment" not in request.json:
         return errorMessageWithCode("No comment added.", 400)
+    if request.json["comment"] == "":
+        return errorMessageWithCode("No comment body included.", 400)
 
     db.session.add(Comment(comment=request.json["comment"], authorId=request.json["authorId"], clipId=clipid))
     db.session.commit()
