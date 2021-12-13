@@ -328,3 +328,9 @@ class GetComments(BaseTestCase):
         assert response.status_code == 200
         assert len(response.json) == 0
 
+    def testGetInvalidClipComments(self):
+
+        response = self.client.get("/comments/5")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Clip doesn't exist."
