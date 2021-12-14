@@ -135,8 +135,7 @@ def deleteClip(clipid):
 
 @app.route("/comments/<clipid>")
 def getComments(clipid):
-    if Clip.query.filter_by(id=clipid).first() is None:
-        return errorMessageWithCode("Clip doesn't exist.", 404)
+    Clip.query.get_or_404(clipid)
 
     comments = Comment.query.order_by(Comment.dateOfCreation.desc()).filter_by(clipId=clipid).all()
     returnComments = []
