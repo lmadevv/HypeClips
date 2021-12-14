@@ -265,7 +265,7 @@ class GetClipInformation(BaseTestCase):
 
         assert response.status_code == 404
 
-class addComment(BaseTestCase):
+class AddComment(BaseTestCase):
     def testAddValidComment(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
