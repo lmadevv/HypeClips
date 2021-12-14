@@ -249,6 +249,7 @@ class GetClipInformation(BaseTestCase):
     def testGetExistingClipInformation(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+        db.session.commit()
 
         response = self.client.get("/clips/info/5")
 
@@ -289,6 +290,7 @@ class GetComments(BaseTestCase):
     def testGetValidClipWithNoComments(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+        db.session.commit()
 
         response = self.client.get("/comments/5")
 
