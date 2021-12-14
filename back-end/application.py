@@ -147,11 +147,11 @@ def getComments(clipid):
 
 @app.route("/comments/<clipid>", methods=["PUT"])
 def addComment(clipid):
-    if Clip.query.filter_by(id=clipid).first() is None:
+    if Clip.query.get(clipid) is None:
         return errorMessageWithCode("Clip doesn't exist.", 404)
     if "authorId" not in request.json:
         return errorMessageWithCode("No author id included.", 400)
-    if User.query.filter_by(id=request.json["authorId"]).first() is None:
+    if User.query.get(request.json["authorId"]) is None:
         return errorMessageWithCode("Author doesn't exist", 404)
     if "comment" not in request.json:
         return errorMessageWithCode("No comment added.", 400)
