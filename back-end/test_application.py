@@ -320,7 +320,6 @@ class addComment(BaseTestCase):
         response = self.client.put("/comments/5", json=dict(authorId=2, comment=""))
         assert response.status_code == 400
         assert response.json["status"] == "No comment body included."
-        assert response.status_code == 404
 
 class GetComments(BaseTestCase):
     def testGetValidClipWithComments(self):
