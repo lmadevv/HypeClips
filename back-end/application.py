@@ -134,8 +134,16 @@ def deleteClip(clipid):
     return EMPTY_RESPONSE
 
 @app.route("/comments/<clipid>")
-def getComments():
-    return None
+def getComments(clipid):
+    Clip.query.get_or_404(clipid)
+
+    comments = Comment.query.order_by(Comment.dateOfCreation.desc()).filter_by(clipId=clipid).all()
+    returnComments = []
+
+    for comment in comments:
+        returnComments.append({"author": comment.author.username, "comment": comment.comment, "date": str(comment.dateOfCreation)})
+
+    return jsonify(returnComments)
 
 @app.route("/comments/<clipid>", methods=["PUT"])
 def addComment():

@@ -1,5 +1,5 @@
 from flask_testing import TestCase
-from application import app, db, User, Clip
+from application import app, db, User, Clip, Comment
 from datetime import datetime
 import os, io, uuid
 
@@ -37,9 +37,7 @@ class BaseTestCase(TestCase):
         return Clip(id=id, authorId=authorId, clipUuid=clipUuid, title=title, description=description, dateOfCreation=dateOfCreation)
 
 class UserLogin(BaseTestCase):
-
     def testValidLogin(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -49,7 +47,6 @@ class UserLogin(BaseTestCase):
         assert response.json['id'] == 1
 
     def testInvalidLoginWrongUsername(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -59,7 +56,6 @@ class UserLogin(BaseTestCase):
         assert response.json["status"] == "not a valid login"
 
     def testInvalidLoginWrongPassword(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -69,9 +65,7 @@ class UserLogin(BaseTestCase):
         assert response.json["status"] == "not a valid login"
 
 class UserRegister(BaseTestCase):
-
     def testValidRegistration(self):
-
         response = self.client.post("/register", json=dict(username="bob", password="pass123"))
 
         assert response.status_code == 200
@@ -83,7 +77,6 @@ class UserRegister(BaseTestCase):
         assert response.json['id'] == 1
 
     def testInvalidRegistrationAlreadyRegistered(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -93,7 +86,6 @@ class UserRegister(BaseTestCase):
         assert response.json["status"] == "unsuccessful registration: user with username already exists"
 
     def testInvalidRegistrationLongUsername(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -104,7 +96,6 @@ class UserRegister(BaseTestCase):
         assert response.json["status"] == "unsuccessful registration: username too long"
 
     def testInvalidRegistrationLongPassword(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -115,9 +106,7 @@ class UserRegister(BaseTestCase):
         assert response.json["status"] == "unsuccessful registration: password too long"
 
 class AddClips(BaseTestCase):
-
     def testValidAddedClip(self):
-
         response = self.client.put("/clips", data={"file": (io.BytesIO(b"this is a test"), "test.mp4"), "authorId": 52, "title": "Bob sick league clip!"})
 
         assert response.status_code == 200
@@ -134,37 +123,31 @@ class AddClips(BaseTestCase):
         os.remove(Clip.getClipPath(clip.clipUuid))
 
     def testNoFilePartAdded(self):
-
         response = self.client.put("clips")
 
         assert response.status_code == 400
         assert response.json["status"] == "no file part added to the request"
 
     def testWrongFileExtensionAdded(self):
-
         response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52, "title": "Bob sick league clip!"})
 
         assert response.status_code == 400
         assert response.json["status"] == "the file had the wrong format"
 
     def testNoAuthorIdIncluded(self):
-
         response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "title": "Bob sick league clip!"})
 
         assert response.status_code == 400
         assert response.json["status"] == "no author id included"
 
     def testNoTitleIncluded(self):
-
         response = self.client.put("clips", data={"file": (io.BytesIO(b"this is a test"), "test.pdf"), "authorId": 52})
 
         assert response.status_code == 400
         assert response.json["status"] == "no title included"
 
 class GetClipIds(BaseTestCase):
-
     def testGetClipIds(self):
-
         db.session.add(self.createClip(id=5, authorId=2, title="WHAT A FLICK!", dateOfCreation=datetime.min))
         db.session.add(self.createClip(id=7, authorId=5, title="DUNK ON NBA", dateOfCreation=datetime.max))
         db.session.commit()
@@ -179,7 +162,6 @@ class GetClipIds(BaseTestCase):
 
 
     def testGetClipIdsEmpty(self):
-
         response = self.client.get("/clips")
 
         assert response.status_code == 200
@@ -187,9 +169,7 @@ class GetClipIds(BaseTestCase):
         assert len(response.json) == 0
 
 class GetClipById(BaseTestCase):
-
     def testGetClipByValidId(self):
-
         clipUuid = str(uuid.uuid4())
         db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
         db.session.commit()
@@ -210,15 +190,12 @@ class GetClipById(BaseTestCase):
         os.remove(clipPath)
 
     def testGetClipByInvalidId(self):
-
         response = self.client.get("/clips/5")
 
         assert response.status_code == 404
 
 class DeleteClip(BaseTestCase):
-
     def testDeleteValidClip(self):
-
         clipUuid = str(uuid.uuid4())
         db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
         db.session.commit()
@@ -236,15 +213,12 @@ class DeleteClip(BaseTestCase):
         assert self.client.delete("/clips/5").status_code == 404
 
     def testDeleteInvalidClip(self):
-
         response = self.client.delete("/clips/5")
 
         assert response.status_code == 404
 
 class GetClipIdsForAuthor(BaseTestCase):
-
     def testGetExistingClipIds(self):
-
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
         db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
@@ -262,7 +236,6 @@ class GetClipIdsForAuthor(BaseTestCase):
         assert 5 == response.json[1]
 
     def testGetNonexistantClipIds(self):
-
         db.session.add(self.createUser())
         db.session.commit()
 
@@ -273,11 +246,10 @@ class GetClipIdsForAuthor(BaseTestCase):
         assert len(response.json) == 0
 
 class GetClipInformation(BaseTestCase):
-
     def testGetExistingClipInformation(self):
-
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+        db.session.commit()
 
         response = self.client.get("/clips/info/5")
 
@@ -289,7 +261,43 @@ class GetClipInformation(BaseTestCase):
         assert response.json["author"] == "bob"
 
     def testGetNonexistantClipInformation(self):
-
         response = self.client.get("/clips/info/5")
+
+        assert response.status_code == 404
+
+class GetComments(BaseTestCase):
+    def testGetValidClipWithComments(self):
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+        db.session.add(User(username="tempuser", password="asdf"))
+        db.session.add(Comment(comment="Nice", authorId=2, clipId=5, dateOfCreation=datetime.max))
+        db.session.add(Comment(comment="thanks", authorId=1, clipId=5, dateOfCreation=datetime.min))
+        db.session.commit()
+
+        response = self.client.get("/comments/5")
+
+        assert response.status_code == 200
+        assert len(response.json) == 2
+
+        assert response.json[0]["comment"] == "Nice"
+        assert response.json[0]["author"] == "tempuser"
+        assert response.json[0]["date"] == str(datetime.max)
+
+        assert response.json[1]["comment"] == "thanks"
+        assert response.json[1]["author"] == "bob"
+        assert response.json[1]["date"] == str(datetime.min)
+
+    def testGetValidClipWithNoComments(self):
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
+        db.session.commit()
+
+        response = self.client.get("/comments/5")
+
+        assert response.status_code == 200
+        assert len(response.json) == 0
+
+    def testGetInvalidClipComments(self):
+        response = self.client.get("/comments/5")
 
         assert response.status_code == 404
