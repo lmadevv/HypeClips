@@ -269,21 +269,22 @@ class AddComment(BaseTestCase):
     def testAddValidComment(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
-        db.session.add(User(username="tempuser", password="asdf"))
+        db.session.add(User(id=2, username="tempuser", password="asdf"))
 
         response = self.client.put("/comments/5", json=dict(authorId=2, comment="nice ace"))
+        commentInDatabase = Comment.query.filter_by(id=1).first()
+
         assert response.status_code == 200
 
-        commentInDatabase = Comment.query.filter_by(id=1).first()
         assert commentInDatabase.comment == "nice ace"
         assert commentInDatabase.clipId == 5
         assert commentInDatabase.authorId == 2
 
     def testInvalidClipId(self):
         db.session.add(self.createUser())
-        db.session.add(User(username="tempuser", password="asdf"))
 
-        response = self.client.put("/comments/5", json=dict(authorId=2, comment="nice ace"))
+        response = self.client.put("/comments/5", json=dict(authorId=1, comment="nice ace"))
+
         assert response.status_code == 404
         assert response.json["status"] == "Clip doesn't exist."
 
@@ -292,6 +293,7 @@ class AddComment(BaseTestCase):
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
 
         response = self.client.put("/comments/5", json=dict(comment="nice ace"))
+
         assert response.status_code == 400
         assert response.json["status"] == "No author id included."
 
@@ -300,6 +302,7 @@ class AddComment(BaseTestCase):
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
 
         response = self.client.put("/comments/5", json=dict(authorId=2, comment="nice ace"))
+
         assert response.status_code == 404
         assert response.json["status"] == "Author doesn't exist"
 
@@ -309,6 +312,7 @@ class AddComment(BaseTestCase):
         db.session.add(User(username="tempuser", password="asdf"))
 
         response = self.client.put("/comments/5", json=dict(authorId=2))
+
         assert response.status_code == 400
         assert response.json["status"] == "No comment added."
 
@@ -318,6 +322,7 @@ class AddComment(BaseTestCase):
         db.session.add(User(username="tempuser", password="asdf"))
 
         response = self.client.put("/comments/5", json=dict(authorId=2, comment=""))
+        
         assert response.status_code == 400
         assert response.json["status"] == "No comment body included."
 
