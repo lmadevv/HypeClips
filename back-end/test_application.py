@@ -309,7 +309,7 @@ class AddComment(BaseTestCase):
     def testNoComment(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
-        db.session.add(User(username="tempuser", password="asdf"))
+        db.session.add(User(id=2, username="tempuser", password="asdf"))
 
         response = self.client.put("/comments/5", json=dict(authorId=2))
 
@@ -319,7 +319,7 @@ class AddComment(BaseTestCase):
     def testNoBodyInComment(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
-        db.session.add(User(username="tempuser", password="asdf"))
+        db.session.add(User(id=2, username="tempuser", password="asdf"))
 
         response = self.client.put("/comments/5", json=dict(authorId=2, comment=""))
         
@@ -330,7 +330,7 @@ class GetComments(BaseTestCase):
     def testGetValidClipWithComments(self):
         db.session.add(self.createUser())
         db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min, description="asdfgg"))
-        db.session.add(User(username="tempuser", password="asdf"))
+        db.session.add(User(id=2, username="tempuser", password="asdf"))
         db.session.add(Comment(comment="Nice", authorId=2, clipId=5, dateOfCreation=datetime.max))
         db.session.add(Comment(comment="thanks", authorId=1, clipId=5, dateOfCreation=datetime.min))
         db.session.commit()
