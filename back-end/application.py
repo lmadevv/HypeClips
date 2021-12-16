@@ -146,8 +146,22 @@ def getComments(clipid):
     return jsonify(returnComments)
 
 @app.route("/comments/<clipid>", methods=["PUT"])
-def addComment():
-    return None
+def addComment(clipid):
+    if Clip.query.get(clipid) is None:
+        return errorMessageWithCode("Clip doesn't exist.", 404)
+    if "authorId" not in request.json:
+        return errorMessageWithCode("No author id included.", 400)
+    if User.query.get(request.json["authorId"]) is None:
+        return errorMessageWithCode("Author doesn't exist", 404)
+    if "comment" not in request.json:
+        return errorMessageWithCode("No comment added.", 400)
+    if request.json["comment"] == "":
+        return errorMessageWithCode("No comment body included.", 400)
+
+    db.session.add(Comment(comment=request.json["comment"], authorId=request.json["authorId"], clipId=clipid))
+    db.session.commit()
+
+    return EMPTY_RESPONSE
 
 @app.route("/user/<userid>")
 def getUser():
