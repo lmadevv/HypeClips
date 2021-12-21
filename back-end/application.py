@@ -33,10 +33,12 @@ class User(db.Model):
     def follow(self, user):
         if not self.isFollowing(user):
             self.followed.append(user)
+            return True
 
     def unfollow(self, user):
         if self.isFollowing(user):
             self.followed.remove(user)
+            return True
 
     def isFollowing(self, user):
         return self.followed.filter(
@@ -200,11 +202,20 @@ def isFollowing(follower, followee):
 
     if follower.isFollowing(followee):
         return EMPTY_RESPONSE
-    return errorMessageWithCode("The follower is not following the followee", 404)
+    return errorMessageWithCode("The follower is not following the followee", 400)
 
 @app.route("/follow/<follower>/<followee>", methods=["PUT"])
 def follow(follower, followee):
-    return None
+    follower = User.query.get(follower)
+    followee = User.query.get(followee)
+    if follower is None:
+        return errorMessageWithCode("Current user (follower) does not exist", 404)
+    if followee is None:
+        return errorMessageWithCode("Other user (followee) does not exist", 404)
+
+    if follower.follow(followee):
+        return EMPTY_RESPONSE
+    return errorMessageWithCode("The follower is already following the followee", 400)
 
 @app.route("/follow/<follower>/<followee>", methods=["DELETE"])
 def unfollow(follower, followee):
