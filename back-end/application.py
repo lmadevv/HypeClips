@@ -199,6 +199,8 @@ def getUser():
 
 @app.route("/follow/<follower>/<followee>")
 def isFollowing(follower, followee):
+    if follower == followee:
+        return errorMessageWithCode("You can't follow yourself", 400)
     follower = User.query.get(follower)
     followee = User.query.get(followee)
     if follower is None:
@@ -212,6 +214,8 @@ def isFollowing(follower, followee):
 
 @app.route("/follow/<follower>/<followee>", methods=["PUT"])
 def follow(follower, followee):
+    if follower == followee:
+        return errorMessageWithCode("You can't follow yourself", 400)
     follower = User.query.get(follower)
     followee = User.query.get(followee)
     if follower is None:
@@ -225,6 +229,8 @@ def follow(follower, followee):
 
 @app.route("/follow/<follower>/<followee>", methods=["DELETE"])
 def unfollow(follower, followee):
+    if follower == followee:
+        return errorMessageWithCode("You can't unfollow yourself", 400)
     follower = User.query.get(follower)
     followee = User.query.get(followee)
     if follower is None:
