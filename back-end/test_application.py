@@ -499,3 +499,43 @@ class Unfollow(BaseTestCase):
 
         assert response.status_code == 404
         assert response.json["status"] == "Other user (followee) does not exist"
+
+class GetFollowFeed(BaseTestCase):
+    def testValidPopulatedFollowFeed(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.add(self.createClip(id=5, authorId=2, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=155, authorId=2, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
+        db.session.add(self.createClip(id=15515, authorId=5, title="ROBLOX HIGHLIGHTS WOW"))  # this is just to test that it doesn't return unneccessary clips.
+        db.session.commit()
+
+        response = self.client.get(f"/follow/clips/{follower.id}")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 2
+        assert 155 == response.json[0]
+        assert 5 == response.json[1]
+
+    def testValidUnpopulatedFollowFeed(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/clips/{follower.id}")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 0
+
+    def testUserDoesntExist(self):
+        response = self.client.get(f"/follow/clips/1")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "User does not exist"
