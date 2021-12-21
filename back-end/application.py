@@ -44,6 +44,12 @@ class User(db.Model):
         return self.followed.filter(
             followers.c.followedId == user.id).count() > 0
 
+    def followedClips(self):
+        return Clip.query.join(
+            followers, (followers.c.followedId == Clip.authorId)).filter(
+            followers.c.followerId == self.id).order_by(
+            Clip.dateOfCreation.desc())
+
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     clipUuid = db.Column(db.String(100), nullable=False)
@@ -245,4 +251,17 @@ def getClipInformation(clipid):
     clip = Clip.query.get_or_404(clipid)
 
     return {"title": clip.title, "description": clip.description, "author": clip.author.username, "date": str(clip.dateOfCreation)}
+
+@app.route("/follow/clips/<userid>")
+def getFollowFeed(userid):
+    clipIds = []
+    user = User.query.get(userid)
+    if user is None:
+        return errorMessageWithCode("User does not exist", 404)
+
+    followedClips = user.followedClips()
+    for clip in followedClips:
+        clipIds.append(clip.id)
+
+    return jsonify(clipIds)
 
