@@ -385,8 +385,54 @@ class IsFollowing(BaseTestCase):
 
         response = self.client.get(f"/follow/{follower.id}/{followee.id}")
 
-        assert response.status_code == 404
+        assert response.status_code == 400
         assert response.json["status"] == "The follower is not following the followee"
+
+    def testNotExistingFollower(self):
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/1/{followee.id}")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Current user (follower) does not exist"
+
+    def testNotExistingFollowee(self):
+        follower = self.createUser()
+        db.session.add(follower)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/{follower.id}/2")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Other user (followee) does not exist"
+
+class Follow(BaseTestCase):
+    def testFollowValid(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert follower.followed.count() > 0
+
+    def testFollowInvalid(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 400
+        assert response.json["status"] == "The follower is already following the followee"
 
     def testNotExistingFollower(self):
         followee = User(id=2, username="tempuser", password="asdf")
