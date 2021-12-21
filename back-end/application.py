@@ -219,7 +219,16 @@ def follow(follower, followee):
 
 @app.route("/follow/<follower>/<followee>", methods=["DELETE"])
 def unfollow(follower, followee):
-    return None
+    follower = User.query.get(follower)
+    followee = User.query.get(followee)
+    if follower is None:
+        return errorMessageWithCode("Current user (follower) does not exist", 404)
+    if followee is None:
+        return errorMessageWithCode("Other user (followee) does not exist", 404)
+
+    if follower.unfollow(followee):
+        return EMPTY_RESPONSE
+    return errorMessageWithCode("The follower is already not following the followee", 400)
 
 @app.route("/<authorid>/clips")
 def getClipIdsForAuthor(authorid):
