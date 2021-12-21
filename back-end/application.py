@@ -14,8 +14,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 followers = db.Table('followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+    db.Column('followerId', db.Integer, db.ForeignKey('user.id')),
+    db.Column('followedId', db.Integer, db.ForeignKey('user.id'))
 )
 
 class User(db.Model):
@@ -26,21 +26,21 @@ class User(db.Model):
     comments = db.relationship("Comment", backref="author", lazy=True)
     followed = db.relationship(
         'User', secondary=followers,
-        primaryjoin=(followers.c.follower_id == id),
-        secondaryjoin=(followers.c.followed_id == id),
+        primaryjoin=(followers.c.followerId == id),
+        secondaryjoin=(followers.c.followedId == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     def follow(self, user):
-        if not self.is_following(user):
+        if not self.isFollowing(user):
             self.followed.append(user)
 
     def unfollow(self, user):
-        if self.is_following(user):
+        if self.isFollowing(user):
             self.followed.remove(user)
 
-    def is_following(self, user):
+    def isFollowing(self, user):
         return self.followed.filter(
-            followers.c.followed_id == user.id).count() > 0
+            followers.c.followedId == user.id).count() > 0
 
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -190,15 +190,24 @@ def getUser():
     return None
 
 @app.route("/follow/<follower>/<followee>")
-def isFollowing():
-    return None
+def isFollowing(follower, followee):
+    follower = User.query.get(follower)
+    followee = User.query.get(followee)
+    if follower is None:
+        return errorMessageWithCode("Current user (follower) does not exist", 404)
+    if followee is None:
+        return errorMessageWithCode("Other user (followee) does not exist", 404)
+
+    if follower.isFollowing(followee):
+        return EMPTY_RESPONSE
+    return errorMessageWithCode("The follower is not following the followee", 404)
 
 @app.route("/follow/<follower>/<followee>", methods=["PUT"])
-def follow():
+def follow(follower, followee):
     return None
 
 @app.route("/follow/<follower>/<followee>", methods=["DELETE"])
-def unfollow():
+def unfollow(follower, followee):
     return None
 
 @app.route("/<authorid>/clips")
