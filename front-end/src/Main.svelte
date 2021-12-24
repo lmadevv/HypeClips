@@ -5,6 +5,7 @@
   import { getContext } from "svelte"
   import UploadClip from "./UploadClip.svelte"
   import Comments from "./Comments.svelte"
+  import formatDateString from "./utils"
 
   const { open } = getContext("simple-modal")
 
@@ -18,18 +19,6 @@
 
   function openCommentsModal(clipId) {
     open(Comments, { clipId })
-  }
-
-  function formatDateString(dateString) {
-    // Treat the date string as UTC.
-    dateString += ` GMT+00:00`
-
-    const date = new Date(dateString)
-    const time =
-      date.getHours() >= 13
-        ? `${date.getHours() - 12}:${date.getMinutes()} PM`
-        : `${date.getHours()}:${date.getMinutes()} AM`
-    return `${date.toDateString().substring(4)}, ${time}`
   }
 
   async function deleteClip(id) {
@@ -77,7 +66,9 @@
         {#await getClipInfo(clipId) then clipInfo}
           <h2>{clipInfo.title}</h2>
           <p>{clipInfo.description}</p>
-          <span class="date">{formatDateString(clipInfo.date)}</span>
+          <span class="date"
+            >Uploaded on {formatDateString(clipInfo.date)} by
+          </span><span class="author">@{clipInfo.author}</span>
         {/await}
 
         <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
@@ -134,5 +125,9 @@
 
   .date {
     color: gray;
+  }
+
+  .author {
+    color: #ff3e00;
   }
 </style>
