@@ -2,8 +2,9 @@
   import { id } from "./store"
   import Client from "./client"
   import VideoPlayer from "svelte-video-player"
-  import UploadClip from "./UploadClip.svelte"
   import { getContext } from "svelte"
+  import UploadClip from "./UploadClip.svelte"
+  import Comments from "./Comments.svelte"
 
   const { open } = getContext("simple-modal")
 
@@ -13,6 +14,10 @@
 
   function openUploadClipModal() {
     open(UploadClip)
+  }
+
+  function openCommentsModal(clipId) {
+    open(Comments, { clipId })
   }
 
   function formatDateString(dateString) {
@@ -77,6 +82,13 @@
 
         <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
 
+        <img
+          on:click={() => openCommentsModal(clipId)}
+          class="small-icon"
+          src="images/comment.png"
+          alt="View clip comments"
+          title="View clip comments"
+        />
         <img
           on:click={() => deleteClip(clipId)}
           class="small-icon"
