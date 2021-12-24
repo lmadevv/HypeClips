@@ -5,6 +5,7 @@
   import Router from "svelte-spa-router"
   import routes from "./routes"
   import { id } from "./store"
+  import Modal from "svelte-simple-modal"
 </script>
 
 <Router {routes} />
@@ -12,5 +13,7 @@
 {#if $id === UNDEFINED_ID}
   <Auth />
 {:else}
-  <Main />
+  <Modal>
+    <Main />
+  </Modal>
 {/if}
