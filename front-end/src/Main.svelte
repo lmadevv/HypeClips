@@ -2,22 +2,29 @@
   import { id } from "./store"
   import Client from "./client"
   import VideoPlayer from "svelte-video-player"
+  import UploadClip from "./UploadClip.svelte"
+  import { getContext } from "svelte"
 
-  let clipSelector
+  const { open } = getContext("simple-modal")
 
   function refreshPage() {
     window.location.reload()
   }
 
-  async function uploadClip(e) {
-    let videoFile = e.target.files[0]
+  function openUploadClipModal() {
+    open(UploadClip)
+  }
 
-    let formData = new FormData()
-    formData.append("file", videoFile)
-    formData.append("authorId", parseInt($id))
+  function formatDateString(dateString) {
+    // Treat the date string as UTC.
+    dateString += ` GMT+00:00`
 
-    await Client.put("/clips", formData)
-    refreshPage()
+    const date = new Date(dateString)
+    const time =
+      date.getHours() >= 13
+        ? `${date.getHours() - 12}:${date.getMinutes()} PM`
+        : `${date.getHours()}:${date.getMinutes()} AM`
+    return `${date.toDateString().substring(4)}, ${time}`
   }
 
   async function deleteClip(id) {
@@ -30,6 +37,11 @@
     return res.data
   }
 
+  async function getClipInfo(id) {
+    let res = await Client.get(`/clips/info/${id}`)
+    return res.data
+  }
+
   function logout() {
     $id = "undefined"
   }
@@ -39,17 +51,11 @@
   <h1>Hypers</h1>
 
   <img
-    on:click={() => clipSelector.click()}
+    on:click={openUploadClipModal}
     class="big-icon"
     src="images/upload.png"
     alt="Upload clip"
     title="Upload clip"
-  />
-  <input
-    type="file"
-    accept=".mp4"
-    on:input|preventDefault={uploadClip}
-    bind:this={clipSelector}
   />
 
   <img
@@ -63,7 +69,14 @@
   {#await getClipIds() then clipIds}
     {#each clipIds as clipId}
       <div class="clip">
+        {#await getClipInfo(clipId) then clipInfo}
+          <h2>{clipInfo.title}</h2>
+          <p>{clipInfo.description}</p>
+          <span class="date">{formatDateString(clipInfo.date)}</span>
+        {/await}
+
         <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
+
         <img
           on:click={() => deleteClip(clipId)}
           class="small-icon"
@@ -100,17 +113,14 @@
     margin: 0 auto;
   }
 
-  input[type="file"] {
-    display: none;
-  }
-
   h1 {
     color: #ff3e00;
     text-transform: uppercase;
     font-weight: 100;
+    font-size: 4em;
   }
 
-  h1 {
-    font-size: 4em;
+  .date {
+    color: gray;
   }
 </style>
