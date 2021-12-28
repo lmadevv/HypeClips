@@ -48,7 +48,9 @@
 </script>
 
 <div id="container">
-  <h1>Hypers</h1>
+  <img class="logo" src="images/hypers.png" alt="Hypers" title="Hypers" />
+
+  <br />
 
   <img
     on:click={openUploadClipModal}
@@ -113,11 +115,9 @@
     margin: 0 auto;
   }
 
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-weight: 100;
-    font-size: 4em;
+  .logo {
+    width: 256px;
+    height: 256px;
   }
 
   .date {
