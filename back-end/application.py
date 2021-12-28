@@ -31,14 +31,16 @@ class User(db.Model):
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     def follow(self, user):
-        if not self.isFollowing(user):
+        isNotFollowing = not self.isFollowing(user)
+        if isNotFollowing:
             self.followed.append(user)
-            return True
+        return isNotFollowing
 
     def unfollow(self, user):
-        if self.isFollowing(user):
+        isFollowing = self.isFollowing(user)
+        if isFollowing:
             self.followed.remove(user)
-            return True
+        return isFollowing
 
     def isFollowing(self, user):
         return self.followed.filter(
