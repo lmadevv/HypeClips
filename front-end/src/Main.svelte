@@ -79,7 +79,7 @@
   {#if isHomeFeed}
     <img class="big-icon" src="images/home-feed.png" on:click={toggleFeed} title="View latest clips" alt="View latest clips" />
   {:else}
-    <img class="big-icon" src="images/follow-feed.png" on:click={toggleFeed} title="View latest clips from your followers" alt="View latest clips from your followers" />
+    <img class="big-icon" src="images/follow-feed.png" on:click={toggleFeed} title="View latest clips from users you are following" alt="View latest clips from users you are following" />
   {/if}
 
   <!-- Duplicated code here for simplicity. To remove code duplication, create a new Svelte component and send in clip info as props. -->
