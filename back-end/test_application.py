@@ -212,6 +212,26 @@ class DeleteClip(BaseTestCase):
         assert os.path.isfile(Clip.getClipPath(clipUuid)) == False
         assert self.client.delete("/clips/5").status_code == 404
 
+    def testDeleteClipWithComments_commentsAlsoDeleted(self):
+        clipUuid = str(uuid.uuid4())
+        db.session.add(self.createClip(id=5, authorId=7, title="HIKO ARE YOU KIDDING ME", clipUuid=clipUuid))
+        db.session.add(Comment(comment="Nice", id=1, authorId=2, clipId=5))
+        db.session.commit()
+        clipPath = Clip.getClipPath(clipUuid)
+
+        testClip = open(clipPath, "w")
+        testClip.write("ASDF")
+        testClip.close()
+        assert os.path.isfile(clipPath)
+
+        # This fails unless comments are also deleted upon clip deletion, due to the following error:
+        # sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: comment.clipId
+        response = self.client.delete("/clips/5")
+
+        assert response.status_code == 200
+        assert os.path.isfile(Clip.getClipPath(clipUuid)) == False
+        assert Comment.query.get(1) is None
+
     def testDeleteInvalidClip(self):
         response = self.client.delete("/clips/5")
 

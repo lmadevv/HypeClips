@@ -27,7 +27,10 @@ class Clip(db.Model):
     dateOfCreation = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     title = db.Column(db.String(20), nullable=False)
     description = db.Column(db.String(200))
-    comments = db.relationship("Comment", backref="clip", lazy=True)
+    # Ensure cascade="all,delete" exists on this field, so that a Clip with Comments can be deleted 
+    # without breaking the database from leftover Comment models containing a null clipId
+    # https://stackoverflow.com/q/5033547
+    comments = db.relationship("Comment", cascade="all,delete", backref="clip", lazy=True)
 
     @staticmethod
     def getClipPath(uuid):

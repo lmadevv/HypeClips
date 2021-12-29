@@ -2,9 +2,11 @@
   import { id } from "./store"
   import Client from "./client"
   import VideoPlayer from "svelte-video-player"
-  import UploadClip from "./UploadClip.svelte"
-  import Profile from "./Profile.svelte"
   import { getContext } from "svelte"
+  import UploadClip from "./UploadClip.svelte"
+  import Comments from "./Comments.svelte"
+  import Profile from "./Profile.svelte"
+  import formatDateString from "./utils"
 
   const { open } = getContext("simple-modal")
 
@@ -20,16 +22,8 @@
     open(Profile, { otherId: 123 })
   }
 
-  function formatDateString(dateString) {
-    // Treat the date string as UTC.
-    dateString += ` GMT+00:00`
-
-    const date = new Date(dateString)
-    const time =
-      date.getHours() >= 13
-        ? `${date.getHours() - 12}:${date.getMinutes()} PM`
-        : `${date.getHours()}:${date.getMinutes()} AM`
-    return `${date.toDateString().substring(4)}, ${time}`
+  function openCommentsModal(clipId) {
+    open(Comments, { clipId })
   }
 
   async function deleteClip(id) {
@@ -77,12 +71,20 @@
         {#await getClipInfo(clipId) then clipInfo}
           <h2>{clipInfo.title}</h2>
           <p>{clipInfo.description}</p>
-          <span class="date">{formatDateString(clipInfo.date)}</span>
-          <span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
+          <span class="date"
+            >{formatDateString(clipInfo.date)} by
+          </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
         {/await}
 
         <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
 
+        <img
+          on:click={() => openCommentsModal(clipId)}
+          class="small-icon"
+          src="images/comment.png"
+          alt="View clip comments"
+          title="View clip comments"
+        />
         <img
           on:click={() => deleteClip(clipId)}
           class="small-icon"
