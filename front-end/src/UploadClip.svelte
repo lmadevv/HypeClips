@@ -38,6 +38,9 @@
 </script>
 
 <div id="container">
+
+  <img class="logo" src="images/hypers.png" alt="Hypers" title="Hypers" />
+
   <form>
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" bind:value={title} />
@@ -69,5 +72,17 @@
 <style>
   input[type="file"] {
     display: none;
+  }
+
+  #container {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 50%;
+  }
+
+  .logo {
+    width: 128px;
+    height: 128px;
   }
 </style>
