@@ -622,5 +622,4 @@ class GetUser(BaseTestCase):
     def testInvalidUser(self):
         response = self.client.get("/user/1")
 
-        assert response.status_code == 400
-        assert response.json["status"] == "User doesn't exist."
+        assert response.status_code == 404

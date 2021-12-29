@@ -209,9 +209,7 @@ def addComment(clipid):
 
 @app.route("/user/<userid>")
 def getUser(userid):
-    user = User.query.get(userid)
-    if user == None:
-        return errorMessageWithCode("User doesn't exist.", 400)
+    user = User.query.get_or_404(userid)
 
     return {"user": user.username, "numClips": len(user.clips)}
 
