@@ -2,6 +2,10 @@
   import { id } from "./store"
   import Client from "./client"
   import formatDateString from "./utils"
+  import { getContext } from "svelte"
+  import Profile from "./Profile.svelte"
+
+  const { open } = getContext("simple-modal")
 
   export let clipId
 
@@ -9,6 +13,10 @@
 
   function refreshPage() {
     window.location.reload()
+  }
+
+  function openProfileModal() {
+    open(Profile, { otherId: 123 })
   }
 
   async function postComment() {
@@ -49,10 +57,13 @@
 
   {#await getComments() then comments}
     {#each comments as comment}
-      {comment.comment}
-      <span class="date">{formatDateString(comment.date)} by </span><span
-        class="author">@{comment.author}</span
-      >
+      <div class="comment">
+        {comment.comment}
+        <br />
+        <span class="date">{formatDateString(comment.date)} by </span><span
+          class="author" on:click={openProfileModal}>@{comment.author}</span>
+      </div>
+      <br />
     {/each}
   {/await}
 </div>
@@ -64,5 +75,6 @@
 
   .author {
     color: #ff3e00;
+    cursor: pointer;
   }
 </style>

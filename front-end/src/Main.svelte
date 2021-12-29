@@ -5,6 +5,7 @@
   import { getContext } from "svelte"
   import UploadClip from "./UploadClip.svelte"
   import Comments from "./Comments.svelte"
+  import Profile from "./Profile.svelte"
   import formatDateString from "./utils"
 
   const { open } = getContext("simple-modal")
@@ -15,6 +16,10 @@
 
   function openUploadClipModal() {
     open(UploadClip)
+  }
+
+  function openProfileModal() {
+    open(Profile, { otherId: 123 })
   }
 
   function openCommentsModal(clipId) {
@@ -67,8 +72,8 @@
           <h2>{clipInfo.title}</h2>
           <p>{clipInfo.description}</p>
           <span class="date"
-            >Uploaded on {formatDateString(clipInfo.date)} by
-          </span><span class="author">@{clipInfo.author}</span>
+            >{formatDateString(clipInfo.date)} by
+          </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
         {/await}
 
         <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
@@ -129,5 +134,6 @@
 
   .author {
     color: #ff3e00;
+    cursor: pointer;
   }
 </style>
