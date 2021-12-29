@@ -375,6 +375,7 @@ class IsFollowing(BaseTestCase):
         response = self.client.get(f"/follow/{follower.id}/{followee.id}")
 
         assert response.status_code == 200
+        assert response.json["following"] == True
 
     def testNotFollowingUser(self):
         follower = self.createUser()
@@ -385,8 +386,8 @@ class IsFollowing(BaseTestCase):
 
         response = self.client.get(f"/follow/{follower.id}/{followee.id}")
 
-        assert response.status_code == 400
-        assert response.json["status"] == "The follower is not following the followee"
+        assert response.status_code == 200
+        assert response.json["following"] == False
 
     def testNotExistingFollower(self):
         followee = User(id=2, username="tempuser", password="asdf")
