@@ -430,6 +430,7 @@ class Follow(BaseTestCase):
         response = self.client.put(f"/follow/{follower.id}/{followee.id}")
 
         assert response.status_code == 200
+        assert response.json["following"] == True
         assert follower.followed.count() > 0
 
     def testFollowInvalid(self):
@@ -442,8 +443,8 @@ class Follow(BaseTestCase):
 
         response = self.client.put(f"/follow/{follower.id}/{followee.id}")
 
-        assert response.status_code == 400
-        assert response.json["status"] == "The follower is already following the followee"
+        assert response.status_code == 200
+        assert response.json["following"] == True
 
     def testNotExistingFollower(self):
         followee = User(id=2, username="tempuser", password="asdf")

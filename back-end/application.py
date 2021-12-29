@@ -223,9 +223,8 @@ def follow(followerId, followeeId):
     if followee is None:
         return errorMessageWithCode("Other user (followee) does not exist", 404)
 
-    if follower.follow(followee):
-        return EMPTY_RESPONSE
-    return errorMessageWithCode("The follower is already following the followee", 400)
+    follower.follow(followee)
+    return {"following": True}
 
 @app.route("/follow/<followerId>/<followeeId>", methods=["DELETE"])
 def unfollow(followerId, followeeId):
