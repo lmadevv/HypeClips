@@ -592,3 +592,32 @@ class GetFollowFeed(BaseTestCase):
 
         assert response.status_code == 404
         assert response.json["status"] == "User does not exist"
+
+class GetUser(BaseTestCase):
+    def testValidUserWithClips(self):
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
+        db.session.commit()
+
+        response = self.client.get("/user/1")
+
+        assert response.status_code == 200
+        assert response.json["user"] == "bob"
+        assert response.json["numClips"] == 2
+
+    def testValidUserWithNoClips(self):
+        db.session.add(self.createUser())
+        db.session.commit()
+
+        response = self.client.get("/user/1")
+
+        assert response.status_code == 200
+        assert response.json["user"] == "bob"
+        assert response.json["numClips"] == 0
+
+    def testInvalidUser(self):
+        response = self.client.get("/user/1")
+
+        assert response.status_code == 400
+        assert response.json["status"] == "User doesn't exist."
