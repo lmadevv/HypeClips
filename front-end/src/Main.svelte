@@ -10,6 +10,8 @@
 
   const { open } = getContext("simple-modal")
 
+  let isHomeFeed = true
+
   function refreshPage() {
     window.location.reload()
   }
@@ -26,13 +28,18 @@
     open(Comments, { clipId })
   }
 
+  function toggleFeed() {
+    isHomeFeed = !isHomeFeed
+  }
+
   async function deleteClip(id) {
     await Client.del(`/clips/${id}`)
     refreshPage()
   }
 
   async function getClipIds() {
-    let res = await Client.get("/clips")
+    let endpoint = isHomeFeed ? "/clips" : `/follow/clips/${parseInt($id)}`  
+    let res = await Client.get(endpoint)
     return res.data
   }
 
@@ -61,40 +68,83 @@
     on:click={logout}
     class="big-icon"
     src="images/logout.png"
-    alt="Log out"
+    alt="Log out" 
     title="Log out"
   />
 
-  {#await getClipIds() then clipIds}
-    {#each clipIds as clipId}
-      <div class="clip">
-        {#await getClipInfo(clipId) then clipInfo}
-          <h2>{clipInfo.title}</h2>
-          <p>{clipInfo.description}</p>
-          <span class="date"
-            >{formatDateString(clipInfo.date)} by
-          </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
-        {/await}
+  <br />
+  <br />
 
-        <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
+  {#if isHomeFeed}
+    <img class="big-icon" src="images/home-feed.png" on:click={toggleFeed} title="View latest clips" alt="View latest clips" />
+  {:else}
+    <img class="big-icon" src="images/follow-feed.png" on:click={toggleFeed} title="View latest clips from users you are following" alt="View latest clips from users you are following" />
+  {/if}
 
-        <img
-          on:click={() => openCommentsModal(clipId)}
-          class="small-icon"
-          src="images/comment.png"
-          alt="View clip comments"
-          title="View clip comments"
-        />
-        <img
-          on:click={() => deleteClip(clipId)}
-          class="small-icon"
-          src="images/delete.png"
-          alt="Delete clip"
-          title="Delete clip"
-        />
-      </div>
-    {/each}
-  {/await}
+  <!-- Duplicated code here for simplicity. To remove code duplication, create a new Svelte component and send in clip info as props. -->
+  {#if isHomeFeed}
+    {#await getClipIds() then clipIds}
+      {#each clipIds as clipId}
+        <div class="clip">
+          {#await getClipInfo(clipId) then clipInfo}
+            <h2>{clipInfo.title}</h2>
+            <p>{clipInfo.description}</p>
+            <span class="date"
+              >{formatDateString(clipInfo.date)} by
+            </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
+          {/await}
+
+          <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
+
+          <img
+            on:click={() => openCommentsModal(clipId)}
+            class="small-icon"
+            src="images/comment.png"
+            alt="View clip comments"
+            title="View clip comments"
+          />
+          <img
+            on:click={() => deleteClip(clipId)}
+            class="small-icon"
+            src="images/delete.png"
+            alt="Delete clip"
+            title="Delete clip"
+          />
+        </div>
+      {/each}
+    {/await}
+  {:else}
+    {#await getClipIds() then clipIds}
+      {#each clipIds as clipId}
+        <div class="clip">
+          {#await getClipInfo(clipId) then clipInfo}
+            <h2>{clipInfo.title}</h2>
+            <p>{clipInfo.description}</p>
+            <span class="date"
+              >{formatDateString(clipInfo.date)} by
+            </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
+          {/await}
+
+          <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
+
+          <img
+            on:click={() => openCommentsModal(clipId)}
+            class="small-icon"
+            src="images/comment.png"
+            alt="View clip comments"
+            title="View clip comments"
+          />
+          <img
+            on:click={() => deleteClip(clipId)}
+            class="small-icon"
+            src="images/delete.png"
+            alt="Delete clip"
+            title="Delete clip"
+          />
+        </div>
+      {/each}
+    {/await}
+  {/if}
 </div>
 
 <style>
