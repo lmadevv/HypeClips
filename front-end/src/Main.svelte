@@ -20,8 +20,8 @@
     open(UploadClip)
   }
 
-  function openProfileModal() {
-    open(Profile, { otherId: 123 })
+  function openProfileModal(clickedId) {
+    open(Profile, { otherId: clickedId })
   }
 
   function openCommentsModal(clipId) {
@@ -93,7 +93,7 @@
             <p>{clipInfo.description}</p>
             <span class="date"
               >{formatDateString(clipInfo.date)} by
-            </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
+            </span><span class="author" on:click={openProfileModal.bind(this, clipInfo.authorId)}>@{clipInfo.author}</span>
           {/await}
 
           <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />
@@ -124,7 +124,7 @@
             <p>{clipInfo.description}</p>
             <span class="date"
               >{formatDateString(clipInfo.date)} by
-            </span><span class="author" on:click={openProfileModal}>@{clipInfo.author}</span>
+            </span><span class="author" on:click={openProfileModal.bind(this, clipInfo.authorId)}>@{clipInfo.author}</span>
           {/await}
 
           <VideoPlayer source="{Client.serverUrl}clips/{clipId}" />

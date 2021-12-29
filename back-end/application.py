@@ -231,6 +231,7 @@ def follow(followerId, followeeId):
 
     if result == True:
         follower.follow(followee)
+        db.session.commit()
         return {"following": True}
     return result
 
@@ -242,6 +243,7 @@ def unfollow(followerId, followeeId):
 
     if result == True:
         follower.unfollow(followee)
+        db.session.commit()
         return {"following": False}
     return result
 

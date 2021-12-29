@@ -15,8 +15,8 @@
     window.location.reload()
   }
 
-  function openProfileModal() {
-    open(Profile, { otherId: 123 })
+  function openProfileModal(clickedId) {
+    open(Profile, { otherId: clickedId })
   }
 
   async function postComment() {
@@ -63,7 +63,7 @@
         {comment.comment}
         <br />
         <span class="date">{formatDateString(comment.date)} by </span><span
-          class="author" on:click={openProfileModal}>@{comment.author}</span>
+          class="author" on:click={openProfileModal.bind(this, comment.authorId)}>@{comment.author}</span>
       </div>
       <br />
     {/each}

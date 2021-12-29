@@ -1,28 +1,40 @@
 <script>
+import Client from "./client";
+
   import { id } from "./store"
   
   export let otherId;
-  let username = "Foo"
+  let username = ""
   let numClips = 0
-  let following = false
+  let following = isFollowing()
 
   function isNotViewingOwnProfile() {
-    // TODO: Compare stored user ID and otherId.
-    return true
-  }
-
-  function follow() {
-    // TODO: Make API call.
-    following = true
-  }
-
-  function unfollow() {
-    // TODO: Make API call.
-    following = false
+    return otherId !== parseInt($id)
   }
 
   function getClipsString() {
     return numClips === 1 ? "clip" : "clips"
+  }
+
+  async function getUserInfo() {
+    let res = await Client.get(`/user/${otherId}`)
+    username = res.data.user
+    numClips = res.data.numClips
+  }
+
+  async function isFollowing() {
+    let res = await Client.get(`/follow/${parseInt($id)}/${otherId}`)
+    following = res.data.following
+  }
+
+  async function follow() {
+    let res = await Client.put(`/follow/${parseInt($id)}/${otherId}`)
+    following = res.data.following
+  }
+
+  async function unfollow() {
+    let res = await Client.del(`/follow/${parseInt($id)}/${otherId}`)
+    following = res.data.following
   }
 </script>
 
@@ -30,7 +42,10 @@
   <img class="logo" src="images/hypers.png" alt="Hypers" title="Hypers" />
 
   <h1>{username}</h1>
-  <span class="numClips">Uploaded {numClips} {getClipsString()}</span>
+
+  {#await getUserInfo() then _}
+    <span class="numClips">Uploaded {numClips} {getClipsString()}</span>
+  {/await}
   
   <br />
   <br />
