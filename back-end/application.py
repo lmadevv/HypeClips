@@ -208,8 +208,12 @@ def addComment(clipid):
     return EMPTY_RESPONSE
 
 @app.route("/user/<userid>")
-def getUser():
-    return None
+def getUser(userid):
+    user = User.query.get(userid)
+    if user == None:
+        return errorMessageWithCode("User doesn't exist.", 400)
+
+    return {"user": user.username, "numClips": len(user.clips)}
 
 @app.route("/follow/<followerId>/<followeeId>")
 def isFollowing(followerId, followeeId):
