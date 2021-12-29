@@ -40,6 +40,8 @@
 </script>
 
 <div id="container">
+  <img class="logo" src="images/hypers.png" alt="Hypers" title="Hypers" />
+
   <form>
     <textarea
       type="text"
@@ -69,6 +71,19 @@
 </div>
 
 <style>
+  #container {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 50%;
+    word-wrap: break-word;
+  }
+
+  .logo {
+    width: 128px;
+    height: 128px;
+  }
+
   .date {
     color: gray;
   }
