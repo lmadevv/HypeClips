@@ -274,11 +274,12 @@ class GetClipInformation(BaseTestCase):
         response = self.client.get("/clips/info/5")
 
         assert response.status_code == 200
-        assert len(response.json) == 4
+        assert len(response.json) == 5
         assert response.json["title"] == "CSGO ACE"
         assert response.json["description"] == "asdfgg"
         assert response.json["date"] == str(datetime.min)
         assert response.json["author"] == "bob"
+        assert response.json["authorId"] == 1
 
     def testGetNonexistantClipInformation(self):
         response = self.client.get("/clips/info/5")
