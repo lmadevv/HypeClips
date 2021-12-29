@@ -431,7 +431,7 @@ class Follow(BaseTestCase):
 
         assert response.status_code == 200
         assert response.json["following"] == True
-        assert follower.followed.count() > 0
+        assert follower.followed.count() == 1
 
     def testFollowInvalid(self):
         follower = self.createUser()
