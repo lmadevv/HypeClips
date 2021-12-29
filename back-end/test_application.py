@@ -363,10 +363,12 @@ class GetComments(BaseTestCase):
         assert response.json[0]["comment"] == "Nice"
         assert response.json[0]["author"] == "tempuser"
         assert response.json[0]["date"] == str(datetime.max)
+        assert response.json[0]["authorId"] == 2
 
         assert response.json[1]["comment"] == "thanks"
         assert response.json[1]["author"] == "bob"
         assert response.json[1]["date"] == str(datetime.min)
+        assert response.json[1]["authorId"] == 1
 
     def testGetValidClipWithNoComments(self):
         db.session.add(self.createUser())

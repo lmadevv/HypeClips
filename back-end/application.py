@@ -185,7 +185,7 @@ def getComments(clipid):
     returnComments = []
 
     for comment in comments:
-        returnComments.append({"author": comment.author.username, "comment": comment.comment, "date": str(comment.dateOfCreation)})
+        returnComments.append({"author": comment.author.username, "comment": comment.comment, "date": str(comment.dateOfCreation), "authorId": comment.author.id})
 
     return jsonify(returnComments)
 
