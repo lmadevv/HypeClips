@@ -185,7 +185,7 @@ def getComments(clipid):
     returnComments = []
 
     for comment in comments:
-        returnComments.append({"author": comment.author.username, "comment": comment.comment, "date": str(comment.dateOfCreation)})
+        returnComments.append({"author": comment.author.username, "comment": comment.comment, "date": str(comment.dateOfCreation), "authorId": comment.author.id})
 
     return jsonify(returnComments)
 
@@ -208,8 +208,10 @@ def addComment(clipid):
     return EMPTY_RESPONSE
 
 @app.route("/user/<userid>")
-def getUser():
-    return None
+def getUser(userid):
+    user = User.query.get_or_404(userid)
+
+    return {"user": user.username, "numClips": len(user.clips)}
 
 @app.route("/follow/<followerId>/<followeeId>")
 def isFollowing(followerId, followeeId):
@@ -257,7 +259,7 @@ def getClipIdsForAuthor(authorid):
 def getClipInformation(clipid):
     clip = Clip.query.get_or_404(clipid)
 
-    return {"title": clip.title, "description": clip.description, "author": clip.author.username, "date": str(clip.dateOfCreation)}
+    return {"title": clip.title, "description": clip.description, "author": clip.author.username, "date": str(clip.dateOfCreation), "authorId": clip.author.id}
 
 @app.route("/follow/clips/<userid>")
 def getFollowFeed(userid):

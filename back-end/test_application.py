@@ -274,11 +274,12 @@ class GetClipInformation(BaseTestCase):
         response = self.client.get("/clips/info/5")
 
         assert response.status_code == 200
-        assert len(response.json) == 4
+        assert len(response.json) == 5
         assert response.json["title"] == "CSGO ACE"
         assert response.json["description"] == "asdfgg"
         assert response.json["date"] == str(datetime.min)
         assert response.json["author"] == "bob"
+        assert response.json["authorId"] == 1
 
     def testGetNonexistantClipInformation(self):
         response = self.client.get("/clips/info/5")
@@ -363,10 +364,12 @@ class GetComments(BaseTestCase):
         assert response.json[0]["comment"] == "Nice"
         assert response.json[0]["author"] == "tempuser"
         assert response.json[0]["date"] == str(datetime.max)
+        assert response.json[0]["authorId"] == 2
 
         assert response.json[1]["comment"] == "thanks"
         assert response.json[1]["author"] == "bob"
         assert response.json[1]["date"] == str(datetime.min)
+        assert response.json[1]["authorId"] == 1
 
     def testGetValidClipWithNoComments(self):
         db.session.add(self.createUser())
@@ -592,3 +595,31 @@ class GetFollowFeed(BaseTestCase):
 
         assert response.status_code == 404
         assert response.json["status"] == "User does not exist"
+
+class GetUser(BaseTestCase):
+    def testValidUserWithClips(self):
+        db.session.add(self.createUser())
+        db.session.add(self.createClip(id=5, authorId=1, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=155, authorId=1, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
+        db.session.commit()
+
+        response = self.client.get("/user/1")
+
+        assert response.status_code == 200
+        assert response.json["user"] == "bob"
+        assert response.json["numClips"] == 2
+
+    def testValidUserWithNoClips(self):
+        db.session.add(self.createUser())
+        db.session.commit()
+
+        response = self.client.get("/user/1")
+
+        assert response.status_code == 200
+        assert response.json["user"] == "bob"
+        assert response.json["numClips"] == 0
+
+    def testInvalidUser(self):
+        response = self.client.get("/user/1")
+
+        assert response.status_code == 404
