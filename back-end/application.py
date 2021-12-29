@@ -199,12 +199,12 @@ def addComment(clipid):
 def getUser():
     return None
 
-@app.route("/follow/<follower>/<followee>")
-def isFollowing(follower, followee):
-    if follower == followee:
+@app.route("/follow/<followerId>/<followeeId>")
+def isFollowing(followerId, followeeId):
+    if followerId == followeeId:
         return errorMessageWithCode("You can't follow yourself", 400)
-    follower = User.query.get(follower)
-    followee = User.query.get(followee)
+    follower = User.query.get(followerId)
+    followee = User.query.get(followeeId)
     if follower is None:
         return errorMessageWithCode("Current user (follower) does not exist", 404)
     if followee is None:
@@ -214,12 +214,12 @@ def isFollowing(follower, followee):
         return EMPTY_RESPONSE
     return errorMessageWithCode("The follower is not following the followee", 400)
 
-@app.route("/follow/<follower>/<followee>", methods=["PUT"])
-def follow(follower, followee):
-    if follower == followee:
+@app.route("/follow/<followerId>/<followeeId>", methods=["PUT"])
+def follow(followerId, followeeId):
+    if followerId == followeeId:
         return errorMessageWithCode("You can't follow yourself", 400)
-    follower = User.query.get(follower)
-    followee = User.query.get(followee)
+    follower = User.query.get(followerId)
+    followee = User.query.get(followeeId)
     if follower is None:
         return errorMessageWithCode("Current user (follower) does not exist", 404)
     if followee is None:
@@ -229,12 +229,12 @@ def follow(follower, followee):
         return EMPTY_RESPONSE
     return errorMessageWithCode("The follower is already following the followee", 400)
 
-@app.route("/follow/<follower>/<followee>", methods=["DELETE"])
-def unfollow(follower, followee):
-    if follower == followee:
+@app.route("/follow/<followerId>/<followeeId>", methods=["DELETE"])
+def unfollow(followerId, followeeId):
+    if followerId == followeeId:
         return errorMessageWithCode("You can't unfollow yourself", 400)
-    follower = User.query.get(follower)
-    followee = User.query.get(followee)
+    follower = User.query.get(followerId)
+    followee = User.query.get(followeeId)
     if follower is None:
         return errorMessageWithCode("Current user (follower) does not exist", 404)
     if followee is None:
