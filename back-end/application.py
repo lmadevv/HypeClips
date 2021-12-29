@@ -75,6 +75,15 @@ class Comment(db.Model):
 def errorMessageWithCode(status, code):
     return {"status": status}, code
 
+def followChecks(follower, followee):
+    if follower is None:
+        return errorMessageWithCode("Current user (follower) does not exist", 404)
+    if followee is None:
+        return errorMessageWithCode("Other user (followee) does not exist", 404)
+    if follower.id == followee.id:
+        return errorMessageWithCode("You can't follow/unfollow yourself", 400)
+    return True     # if all the checks pass we return true for everything checks out
+
 @app.route("/login", methods=["POST"])
 def login():
     user = User.query.filter_by(username=request.json["username"], password=request.json["password"]).first()
@@ -201,44 +210,35 @@ def getUser():
 
 @app.route("/follow/<followerId>/<followeeId>")
 def isFollowing(followerId, followeeId):
-    if followerId == followeeId:
-        return errorMessageWithCode("You can't follow yourself", 400)
     follower = User.query.get(followerId)
     followee = User.query.get(followeeId)
-    if follower is None:
-        return errorMessageWithCode("Current user (follower) does not exist", 404)
-    if followee is None:
-        return errorMessageWithCode("Other user (followee) does not exist", 404)
+    result = followChecks(follower, followee)
 
-    return {"following": follower.isFollowing(followee)}
+    if result == True:
+        return {"following": follower.isFollowing(followee)}
+    return result
 
 @app.route("/follow/<followerId>/<followeeId>", methods=["PUT"])
 def follow(followerId, followeeId):
-    if followerId == followeeId:
-        return errorMessageWithCode("You can't follow yourself", 400)
     follower = User.query.get(followerId)
     followee = User.query.get(followeeId)
-    if follower is None:
-        return errorMessageWithCode("Current user (follower) does not exist", 404)
-    if followee is None:
-        return errorMessageWithCode("Other user (followee) does not exist", 404)
+    result = followChecks(follower, followee)
 
-    follower.follow(followee)
-    return {"following": True}
+    if result == True:
+        follower.follow(followee)
+        return {"following": True}
+    return result
 
 @app.route("/follow/<followerId>/<followeeId>", methods=["DELETE"])
 def unfollow(followerId, followeeId):
-    if followerId == followeeId:
-        return errorMessageWithCode("You can't unfollow yourself", 400)
     follower = User.query.get(followerId)
     followee = User.query.get(followeeId)
-    if follower is None:
-        return errorMessageWithCode("Current user (follower) does not exist", 404)
-    if followee is None:
-        return errorMessageWithCode("Other user (followee) does not exist", 404)
+    result = followChecks(follower, followee)
 
-    follower.unfollow(followee)
-    return {"following": False}
+    if result == True:
+        follower.unfollow(followee)
+        return {"following": False}
+    return result
 
 @app.route("/<authorid>/clips")
 def getClipIdsForAuthor(authorid):

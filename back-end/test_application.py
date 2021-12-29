@@ -417,7 +417,7 @@ class IsFollowing(BaseTestCase):
         response = self.client.get(f"/follow/{user.id}/{user.id}")
 
         assert response.status_code == 400
-        assert response.json["status"] == "You can't follow yourself"
+        assert response.json["status"] == "You can't follow/unfollow yourself"
 
 class Follow(BaseTestCase):
     def testFollowValid(self):
@@ -474,7 +474,7 @@ class Follow(BaseTestCase):
         response = self.client.put(f"/follow/{user.id}/{user.id}")
 
         assert response.status_code == 400
-        assert response.json["status"] == "You can't follow yourself"
+        assert response.json["status"] == "You can't follow/unfollow yourself"
 
 class Unfollow(BaseTestCase):
     def testUnfollowValid(self):
@@ -531,7 +531,7 @@ class Unfollow(BaseTestCase):
         response = self.client.delete(f"/follow/{user.id}/{user.id}")
 
         assert response.status_code == 400
-        assert response.json["status"] == "You can't unfollow yourself"
+        assert response.json["status"] == "You can't follow/unfollow yourself"
 
 class GetFollowFeed(BaseTestCase):
     def testValidPopulatedFollowFeed(self):
