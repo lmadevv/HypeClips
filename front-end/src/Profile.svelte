@@ -4,7 +4,7 @@ import Client from "./client";
   import { id } from "./store"
   
   export let otherId;
-  let username = "Foo"
+  let username = ""
   let numClips = 0
   let following = isFollowing()
 
@@ -36,15 +36,16 @@ import Client from "./client";
     let res = await Client.del(`/follow/${parseInt($id)}/${otherId}`)
     following = res.data.following
   }
-
-  getUserInfo()
 </script>
 
 <div id="container">
   <img class="logo" src="images/hypers.png" alt="Hypers" title="Hypers" />
 
   <h1>{username}</h1>
-  <span class="numClips">Uploaded {numClips} {getClipsString()}</span>
+
+  {#await getUserInfo() then _}
+    <span class="numClips">Uploaded {numClips} {getClipsString()}</span>
+  {/await}
   
   <br />
   <br />
