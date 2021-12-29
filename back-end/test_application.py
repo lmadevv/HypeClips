@@ -488,6 +488,7 @@ class Unfollow(BaseTestCase):
         response = self.client.delete(f"/follow/{follower.id}/{followee.id}")
 
         assert response.status_code == 200
+        assert response.json["following"] == False
         assert follower.followed.count() == 0
 
     def testFollowInvalid(self):
@@ -499,8 +500,8 @@ class Unfollow(BaseTestCase):
 
         response = self.client.delete(f"/follow/{follower.id}/{followee.id}")
 
-        assert response.status_code == 400
-        assert response.json["status"] == "The follower is already not following the followee"
+        assert response.status_code == 200
+        assert response.json["following"] == False
 
     def testNotExistingFollower(self):
         followee = User(id=2, username="tempuser", password="asdf")

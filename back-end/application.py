@@ -237,9 +237,8 @@ def unfollow(followerId, followeeId):
     if followee is None:
         return errorMessageWithCode("Other user (followee) does not exist", 404)
 
-    if follower.unfollow(followee):
-        return EMPTY_RESPONSE
-    return errorMessageWithCode("The follower is already not following the followee", 400)
+    follower.unfollow(followee)
+    return {"following": False}
 
 @app.route("/<authorid>/clips")
 def getClipIdsForAuthor(authorid):
