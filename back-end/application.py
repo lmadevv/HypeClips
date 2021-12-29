@@ -13,12 +13,44 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
+followers = db.Table('followers',
+    db.Column('followerId', db.Integer, db.ForeignKey('user.id')),
+    db.Column('followedId', db.Integer, db.ForeignKey('user.id'))
+)
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(40), nullable=False)
     clips = db.relationship("Clip", backref="author", lazy=True)
     comments = db.relationship("Comment", backref="author", lazy=True)
+    followed = db.relationship(
+        'User', secondary=followers,
+        primaryjoin=(followers.c.followerId == id),
+        secondaryjoin=(followers.c.followedId == id),
+        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+
+    def follow(self, user):
+        isNotFollowing = not self.isFollowing(user)
+        if isNotFollowing:
+            self.followed.append(user)
+        return isNotFollowing
+
+    def unfollow(self, user):
+        isFollowing = self.isFollowing(user)
+        if isFollowing:
+            self.followed.remove(user)
+        return isFollowing
+
+    def isFollowing(self, user):
+        return self.followed.filter(
+            followers.c.followedId == user.id).count() > 0
+
+    def followedClips(self):
+        return Clip.query.join(
+            followers, (followers.c.followedId == Clip.authorId)).filter(
+            followers.c.followerId == self.id).order_by(
+            Clip.dateOfCreation.desc())
 
 class Clip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +77,15 @@ class Comment(db.Model):
 
 def errorMessageWithCode(status, code):
     return {"status": status}, code
+
+def followChecks(follower, followee):
+    if follower is None:
+        return errorMessageWithCode("Current user (follower) does not exist", 404)
+    if followee is None:
+        return errorMessageWithCode("Other user (followee) does not exist", 404)
+    if follower.id == followee.id:
+        return errorMessageWithCode("You can't follow/unfollow yourself", 400)
+    return True     # if all the checks pass we return true for everything checks out
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -170,17 +211,37 @@ def addComment(clipid):
 def getUser():
     return None
 
-@app.route("/follow/<follower>/<followee>")
-def isFollowing():
-    return None
+@app.route("/follow/<followerId>/<followeeId>")
+def isFollowing(followerId, followeeId):
+    follower = User.query.get(followerId)
+    followee = User.query.get(followeeId)
+    result = followChecks(follower, followee)
 
-@app.route("/follow/<follower>/<followee>", methods=["PUT"])
-def follow():
-    return None
+    if result == True:
+        return {"following": follower.isFollowing(followee)}
+    return result
 
-@app.route("/follow/<follower>/<followee>", methods=["DELETE"])
-def unfollow():
-    return None
+@app.route("/follow/<followerId>/<followeeId>", methods=["PUT"])
+def follow(followerId, followeeId):
+    follower = User.query.get(followerId)
+    followee = User.query.get(followeeId)
+    result = followChecks(follower, followee)
+
+    if result == True:
+        follower.follow(followee)
+        return {"following": True}
+    return result
+
+@app.route("/follow/<followerId>/<followeeId>", methods=["DELETE"])
+def unfollow(followerId, followeeId):
+    follower = User.query.get(followerId)
+    followee = User.query.get(followeeId)
+    result = followChecks(follower, followee)
+
+    if result == True:
+        follower.unfollow(followee)
+        return {"following": False}
+    return result
 
 @app.route("/<authorid>/clips")
 def getClipIdsForAuthor(authorid):
@@ -197,4 +258,17 @@ def getClipInformation(clipid):
     clip = Clip.query.get_or_404(clipid)
 
     return {"title": clip.title, "description": clip.description, "author": clip.author.username, "date": str(clip.dateOfCreation)}
+
+@app.route("/follow/clips/<userid>")
+def getFollowFeed(userid):
+    clipIds = []
+    user = User.query.get(userid)
+    if user is None:
+        return errorMessageWithCode("User does not exist", 404)
+
+    followedClips = user.followedClips()
+    for clip in followedClips:
+        clipIds.append(clip.id)
+
+    return jsonify(clipIds)
 

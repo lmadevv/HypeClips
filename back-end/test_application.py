@@ -382,3 +382,213 @@ class GetComments(BaseTestCase):
         response = self.client.get("/comments/5")
 
         assert response.status_code == 404
+
+class IsFollowing(BaseTestCase):
+    def testFollowingUser(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert response.json["following"] == True
+
+    def testNotFollowingUser(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert response.json["following"] == False
+
+    def testNotExistingFollower(self):
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/1/{followee.id}")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Current user (follower) does not exist"
+
+    def testNotExistingFollowee(self):
+        follower = self.createUser()
+        db.session.add(follower)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/{follower.id}/2")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Other user (followee) does not exist"
+
+    def testIsFollowingOneself(self):
+        user = self.createUser()
+        db.session.add(user)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/{user.id}/{user.id}")
+
+        assert response.status_code == 400
+        assert response.json["status"] == "You can't follow/unfollow yourself"
+
+class Follow(BaseTestCase):
+    def testFollowValid(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert response.json["following"] == True
+        assert follower.followed.count() == 1
+
+    def testFollowInvalid(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert response.json["following"] == True
+
+    def testNotExistingFollower(self):
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/1/{followee.id}")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Current user (follower) does not exist"
+
+    def testNotExistingFollowee(self):
+        follower = self.createUser()
+        db.session.add(follower)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/{follower.id}/2")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Other user (followee) does not exist"
+
+    def testFollowOneself(self):
+        user = self.createUser()
+        db.session.add(user)
+        db.session.commit()
+
+        response = self.client.put(f"/follow/{user.id}/{user.id}")
+
+        assert response.status_code == 400
+        assert response.json["status"] == "You can't follow/unfollow yourself"
+
+class Unfollow(BaseTestCase):
+    def testUnfollowValid(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.commit()
+
+        response = self.client.delete(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert response.json["following"] == False
+        assert follower.followed.count() == 0
+
+    def testFollowInvalid(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.delete(f"/follow/{follower.id}/{followee.id}")
+
+        assert response.status_code == 200
+        assert response.json["following"] == False
+
+    def testNotExistingFollower(self):
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(followee)
+        db.session.commit()
+
+        response = self.client.delete(f"/follow/1/{followee.id}")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Current user (follower) does not exist"
+
+    def testNotExistingFollowee(self):
+        follower = self.createUser()
+        db.session.add(follower)
+        db.session.commit()
+
+        response = self.client.delete(f"/follow/{follower.id}/2")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "Other user (followee) does not exist"
+
+    def testUnfollowOneself(self):
+        user = self.createUser()
+        db.session.add(user)
+        db.session.commit()
+
+        response = self.client.delete(f"/follow/{user.id}/{user.id}")
+
+        assert response.status_code == 400
+        assert response.json["status"] == "You can't follow/unfollow yourself"
+
+class GetFollowFeed(BaseTestCase):
+    def testValidPopulatedFollowFeed(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.add(self.createClip(id=5, authorId=2, title="CSGO ACE", dateOfCreation=datetime.min))
+        db.session.add(self.createClip(id=155, authorId=2, title="VALORANT NINJA DEFUSE", dateOfCreation=datetime.max))
+        db.session.add(self.createClip(id=15515, authorId=5, title="ROBLOX HIGHLIGHTS WOW"))  # this is just to test that it doesn't return unneccessary clips.
+        db.session.commit()
+
+        response = self.client.get(f"/follow/clips/{follower.id}")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 2
+        assert 155 == response.json[0]
+        assert 5 == response.json[1]
+
+    def testValidUnpopulatedFollowFeed(self):
+        follower = self.createUser()
+        followee = User(id=2, username="tempuser", password="asdf")
+        db.session.add(follower)
+        db.session.add(followee)
+        follower.followed.append(followee)
+        db.session.commit()
+
+        response = self.client.get(f"/follow/clips/{follower.id}")
+
+        assert response.status_code == 200
+        assert isinstance(response.json, list)
+        assert len(response.json) == 0
+
+    def testUserDoesntExist(self):
+        response = self.client.get(f"/follow/clips/1")
+
+        assert response.status_code == 404
+        assert response.json["status"] == "User does not exist"
